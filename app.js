@@ -75,7 +75,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let fakeProgressVal       = 0;
     let isCanceled            = false;
     let retryCount            = 0;
-    const TEMPLATE_VIDEO_OSS_URL = 'https://aimiaoying-shanghai.oss-cn-shanghai.aliyuncs.com/digitalperson/ai/video/202603/02/fd8472bc-edca-4aaf-bb59-9b265d5f58c9.mp4';
+    const FACESWAP_TEMPLATE_URLS = [
+        'https://hy-baolaidian.oss-cn-beijing.aliyuncs.com/baolai/video/video_00001-audio.mp4',
+        'https://hy-baolaidian.oss-cn-beijing.aliyuncs.com/baolai/video/video_00002-audio.mp4',
+        'https://hy-baolaidian.oss-cn-beijing.aliyuncs.com/baolai/video/video_00003-audio.mp4',
+        'https://hy-baolaidian.oss-cn-beijing.aliyuncs.com/baolai/video/video_00004-audio.mp4',
+    ];
 
     // ===================== INIT =====================
     renderSceneGrid();
@@ -302,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
         faceSwapResetState();
         isCanceled = false;
         retryCount = 0;
-        tplVideo.src = TEMPLATE_VIDEO_OSS_URL;
+        tplVideo.src = FACESWAP_TEMPLATE_URLS[index] || FACESWAP_TEMPLATE_URLS[0];
         tplVideo.play().catch(() => {});
         pageFaceSwap.classList.remove('hidden');
         setTimeout(() => pageFaceSwap.classList.add('active'), 10);
@@ -359,7 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Step2: 提交换脸任务（对应 generatePhoto，type 传 ""）
             const submitPayload = {
-                videoUrl:   TEMPLATE_VIDEO_OSS_URL,
+                videoUrl:   FACESWAP_TEMPLATE_URLS[faceSwapTemplateIndex] || FACESWAP_TEMPLATE_URLS[0],
                 imageUrl:   imageUrl,
                 templateId: 0,  // 自定义模式固定传 0
                 userId:     userId,
