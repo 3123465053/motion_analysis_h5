@@ -89,8 +89,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.switchTab    = switchTab;
     window.toggleBannerSound = toggleBannerSound;
+    window.toggleBannerPlay  = toggleBannerPlay;
 
-    // ===== BANNER SOUND =====
+    // ===== BANNER CONTROLS =====
+    let bannerPlayOverlayTimer = null;
+
+    function toggleBannerPlay() {
+        const video   = document.getElementById('banner-video');
+        const overlay = document.getElementById('banner-play-overlay');
+        const icon    = document.getElementById('banner-play-icon');
+        if (!video) return;
+        if (video.paused) {
+            video.play().catch(() => {});
+            icon.textContent = 'pause';
+        } else {
+            video.pause();
+            icon.textContent = 'play_arrow';
+        }
+        // 短暂显示图标后淡出
+        overlay.style.opacity = '1';
+        clearTimeout(bannerPlayOverlayTimer);
+        bannerPlayOverlayTimer = setTimeout(() => { overlay.style.opacity = '0'; }, 800);
+    }
+
     function toggleBannerSound() {
         const video = document.getElementById('banner-video');
         const icon  = document.getElementById('banner-sound-icon');
