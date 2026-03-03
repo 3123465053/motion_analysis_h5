@@ -902,3 +902,132 @@ body {
     background: var(--primary-color);
     color: #333;
 }
+
+/* ===== ANALYSIS PAGE - ENHANCED LAYOUT ===== */
+.analysis-app-bar {
+    background: #fff;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    padding-top: env(safe-area-inset-top, 44px);
+    padding-top: max(env(safe-area-inset-top, 0px), 44px);
+    flex-shrink: 0;
+    border-bottom: 1px solid #f0f0f0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+/* 视频区域增强 */
+#page-analysis .video-cover-container {
+    margin: 14px 16px 0;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+
+/* 加载状态卡片 */
+.analysis-loading-card {
+    margin: 20px 16px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 24px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.analysis-spinner {
+    width: 44px;
+    height: 44px;
+    border: 4px solid #f0f0f0;
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin-anim 0.8s linear infinite;
+    margin-bottom: 4px;
+}
+@keyframes spin-anim { to { transform: rotate(360deg); } }
+
+.analysis-loading-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.analysis-loading-percent {
+    color: var(--primary-color);
+    font-size: 15px;
+    font-weight: 700;
+    min-width: 36px;
+}
+
+.analysis-progress-track {
+    width: 70% !important;
+    height: 6px;
+    background: #f0f0f0;
+    border-radius: 100px;
+    overflow: hidden;
+}
+
+.analysis-loading-hint {
+    font-size: 12px;
+    color: #bbb;
+    margin-top: 2px;
+}
+
+/* 结果卡片 */
+.analysis-result-card {
+    margin: 14px 16px 20px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    padding: 20px 18px 24px;
+    line-height: 1.7;
+}
+
+.analysis-result-card h1,
+.analysis-result-card h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #222;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--primary-color);
+    display: inline-block;
+}
+
+.analysis-result-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #444;
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+.analysis-result-card p {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 12px;
+}
+
+.analysis-result-card ul, .analysis-result-card ol {
+    padding-left: 18px;
+    color: #555;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+/* FAB 按钮增强 */
+#page-analysis .fab-container {
+    background: var(--primary-color);
+    box-shadow: 0 4px 14px rgba(255,215,0,0.5);
+}
+
+#page-analysis #audio-icon {
+    color: #333;
+}

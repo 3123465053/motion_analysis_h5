@@ -38,10 +38,10 @@
         <div class="faceswap-section">
             <div class="section-header">
                 <span class="material-icons section-icon" style="color:#ff6b6b">face_retouching_natural</span>
-                <span class="section-title">运动视频换脸</span>
+                <span class="section-title">成为运动主角</span>
                 <span class="faceswap-badge">AI</span>
             </div>
-            <p class="faceswap-desc">选择模板视频，上传正脸照片，AI 为你生成专属运动视频</p>
+            <p class="faceswap-desc">选一段模板，拍一张正脸，让 AI 把你带入运动大片</p>
             <div class="faceswap-grid">
                 <div class="faceswap-card" onclick="openFaceSwap(0)">
                     <div class="faceswap-video-wrap">
@@ -79,16 +79,17 @@
 
 <!-- PAGE: ANALYSIS 分析结果 -->
 <div id="page-analysis" class="page hidden">
-    <div class="app-bar">
+    <div class="analysis-app-bar">
         <div class="app-bar-left">
             <span class="material-icons back-btn" id="back-btn">arrow_back_ios</span>
         </div>
-        <div class="app-bar-title">分析结果</div>
+        <div class="app-bar-title">挥拍分析</div>
         <div class="app-bar-right">
             <div class="share-btn" id="share-btn">分享</div>
         </div>
     </div>
     <div class="scroll-content analysis-content">
+        <!-- 视频区域 -->
         <div class="video-cover-container" id="video-cover">
             <video id="video-player" controls playsinline style="display:none;"></video>
             <div class="cover-overlay" id="cover-overlay">
@@ -96,12 +97,20 @@
             </div>
             <img id="video-thumbnail" src="" alt="" style="display:none;">
         </div>
-        <div id="loading-state" class="center-state">
-            <div class="loading-text">分析中... <span id="loading-percent">0%</span></div>
-            <div class="progress-track"><div class="progress-fill" id="progress-bar"></div></div>
+        <!-- 加载状态 -->
+        <div id="loading-state" class="analysis-loading-card">
+            <div class="analysis-spinner"></div>
+            <div class="analysis-loading-label">AI 教练分析中<span id="loading-percent" class="analysis-loading-percent">0%</span></div>
+            <div class="progress-track analysis-progress-track"><div class="progress-fill" id="progress-bar"></div></div>
+            <div class="analysis-loading-hint">请稍候，通常需要 10~30 秒</div>
         </div>
-        <div id="empty-state" class="center-state hidden"><div class="empty-text">暂无分析结果</div></div>
-        <div id="result-content" class="markdown-body hidden"></div>
+        <!-- 空状态 -->
+        <div id="empty-state" class="center-state hidden">
+            <span class="material-icons" style="font-size:56px;color:#ddd;margin-bottom:12px">sports_tennis</span>
+            <div class="empty-text">暂无分析结果</div>
+        </div>
+        <!-- 结果 -->
+        <div id="result-content" class="analysis-result-card markdown-body hidden"></div>
     </div>
     <div class="fab-container" id="fab-audio">
         <span class="material-icons" id="audio-icon">play_arrow</span>
@@ -156,7 +165,7 @@
         <div class="app-bar-left">
             <span class="material-icons back-btn" id="faceswap-back-btn">arrow_back_ios</span>
         </div>
-        <div class="app-bar-title">运动视频换脸</div>
+        <div class="app-bar-title">AI 运动写真</div>
         <div class="app-bar-right"></div>
     </div>
     <div class="scroll-content" style="padding-bottom:50px">
