@@ -90,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.switchTab    = switchTab;
     window.toggleBannerSound = toggleBannerSound;
     window.toggleBannerPlay  = toggleBannerPlay;
+    window.showToast          = showToast;
 
     // ===== BANNER CONTROLS =====
     let bannerPlayOverlayTimer = null;
