@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ===================== CONFIG =====================
-    const BASE_URL         = 'https://api.ai-face.ai';
+    const BASE_URL         = 'https://api.douring.cn';
     const API_URL          = BASE_URL + '/couple/video/analyze';
     const FACE_UPLOAD_URL  = BASE_URL + '/ai/file/saveFile/';          // 上传人脸图片
     const FACE_SUBMIT_URL  = BASE_URL + '/ai/face/fusionFaces';        // 提交换脸任务
