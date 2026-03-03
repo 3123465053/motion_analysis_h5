@@ -1085,3 +1085,9 @@ body {
     font-size: 10px;
     color: #ccc;
 }
+
+/* ME 页去掉 profile header 后的顶部安全区 */
+.me-top-safe {
+    height: max(env(safe-area-inset-top, 0px), 44px);
+    flex-shrink: 0;
+}
