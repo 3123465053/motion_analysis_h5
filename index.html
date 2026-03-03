@@ -170,25 +170,28 @@
     </div>
     <div class="scroll-content" style="padding-bottom:50px">
 
-        <!-- 模板视频预览 -->
-        <div style="margin:10px 16px 0;">
-            <div style="font-size:13px;color:#888;margin-bottom:8px;">当前模板</div>
-            <div class="faceswap-tpl-preview">
-                <video id="faceswap-tpl-video" muted loop playsinline
-                    style="width:100%;height:100%;object-fit:cover;border-radius:12px;display:block;"></video>
+        <!-- 模板视频 + 人脸照片 并排 -->
+        <div class="fs-dual-row">
+            <!-- 左：模板视频 -->
+            <div class="fs-dual-col">
+                <div class="fs-col-label">当前模板</div>
+                <div class="fs-tpl-box">
+                    <video id="faceswap-tpl-video" muted loop playsinline
+                        style="width:100%;height:100%;object-fit:cover;border-radius:12px;display:block;"></video>
+                    <div class="fs-tpl-tag">模板预览</div>
+                </div>
             </div>
-        </div>
-
-        <!-- 上传人脸照片 -->
-        <div style="margin:16px 16px 0;">
-            <div style="font-size:13px;color:#888;margin-bottom:8px;">上传人脸照片</div>
-            <div class="faceswap-upload-box" id="faceswap-upload-box">
-                <img id="faceswap-photo-preview" src="" alt=""
-                    style="display:none;width:100%;height:100%;object-fit:cover;border-radius:12px;">
-                <div id="faceswap-upload-placeholder" style="display:flex;flex-direction:column;align-items:center;">
-                    <span class="material-icons" style="font-size:40px;color:#ccc">add_photo_alternate</span>
-                    <div style="font-size:13px;color:#aaa;margin-top:8px">点击上传正脸照片</div>
-                    <div style="font-size:11px;color:#ccc;margin-top:4px">支持 JPG / PNG，建议正脸清晰</div>
+            <!-- 右：上传人脸 -->
+            <div class="fs-dual-col">
+                <div class="fs-col-label">上传人脸照片</div>
+                <div class="fs-upload-box" id="faceswap-upload-box">
+                    <img id="faceswap-photo-preview" src="" alt=""
+                        style="display:none;width:100%;height:100%;object-fit:cover;border-radius:12px;">
+                    <div id="faceswap-upload-placeholder">
+                        <span class="material-icons" style="font-size:32px;color:#ccc">add_photo_alternate</span>
+                        <div class="fs-upload-hint">点击上传</div>
+                        <div class="fs-upload-sub">JPG / PNG</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -196,7 +199,7 @@
         <!-- 提示 -->
         <div class="faceswap-tips">
             <span class="material-icons" style="font-size:14px;margin-right:4px;flex-shrink:0">info_outline</span>
-            <span>请确保照片中只有一张人脸，五官清晰无遮挡，正脸角度偏侧不超过 30°</span>
+            <span>请确保照片中只有一张人脸，五官清晰，正脸角度偏侧不超过 30°</span>
         </div>
 
         <!-- 提交按钮 -->

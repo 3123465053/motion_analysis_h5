@@ -822,37 +822,9 @@ body {
 }
 
 /* 换脸页面 */
-.faceswap-tpl-preview {
-    aspect-ratio: 16/9;
-    background: #111;
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-.faceswap-upload-box {
-    width: 100%;
-    aspect-ratio: 1/1;
-    max-height: 220px;
-    border: 2px dashed #ddd;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #fafafa;
-    cursor: pointer;
-    overflow: hidden;
-    position: relative;
-    transition: border-color 0.2s;
-}
-
-.faceswap-upload-box:active { border-color: var(--primary-color); }
-
-#faceswap-upload-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    pointer-events: none;
-}
+/* faceswap-tpl-preview & faceswap-upload-box 已迁移至 fs-dual-row 布局 */
+.faceswap-tpl-preview { display: none; }
+.faceswap-upload-box { /* 由 fs-upload-box 接管 */ }
 
 .faceswap-tips {
     display: flex;
@@ -1030,4 +1002,86 @@ body {
 
 #page-analysis #audio-icon {
     color: #333;
+}
+
+/* ===== FACESWAP PAGE - DUAL COLUMN LAYOUT ===== */
+.fs-dual-row {
+    display: flex;
+    gap: 12px;
+    margin: 14px 16px 0;
+    align-items: flex-start;
+}
+
+.fs-dual-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.fs-col-label {
+    font-size: 12px;
+    color: #999;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+/* 模板视频：竖屏比例 */
+.fs-tpl-box {
+    position: relative;
+    aspect-ratio: 9 / 14;
+    background: #111;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.fs-tpl-tag {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    white-space: nowrap;
+    backdrop-filter: blur(4px);
+}
+
+/* 上传照片：同等高度，方形 */
+.fs-upload-box {
+    aspect-ratio: 9 / 14;
+    background: #fafafa;
+    border: 2px dashed #ddd;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.fs-upload-box:active { border-color: var(--primary-color); }
+
+#faceswap-upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    gap: 4px;
+}
+
+.fs-upload-hint {
+    font-size: 12px;
+    color: #aaa;
+    margin-top: 4px;
+}
+
+.fs-upload-sub {
+    font-size: 10px;
+    color: #ccc;
 }
