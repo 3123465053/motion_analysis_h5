@@ -76,10 +76,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let isCanceled            = false;
     let retryCount            = 0;
     const FACESWAP_TEMPLATE_URLS = [
-        'https://hy-baolaidian.oss-cn-beijing.aliyuncs.com/baolai/video/video_00001-audio.mp4',
-        'https://hy-baolaidian.oss-cn-beijing.aliyuncs.com/baolai/video/video_00002-audio.mp4',
-        'https://hy-baolaidian.oss-cn-beijing.aliyuncs.com/baolai/video/video_00003-audio.mp4',
-        'https://hy-baolaidian.oss-cn-beijing.aliyuncs.com/baolai/video/video_00004-audio.mp4',
+        'https://aimiaoying-shanghai.oss-cn-shanghai.aliyuncs.com/digitalperson/ai/video/video_00001-audio.mp4',
+        'https://aimiaoying-shanghai.oss-cn-shanghai.aliyuncs.com/digitalperson/ai/video/video_00002-audio.mp4',
+        'https://aimiaoying-shanghai.oss-cn-shanghai.aliyuncs.com/digitalperson/ai/video/video_00003-audio.mp4',
+        'https://aimiaoying-shanghai.oss-cn-shanghai.aliyuncs.com/digitalperson/ai/video/video_00004-audio.mp4',
     ];
 
     // ===================== INIT =====================
