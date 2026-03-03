@@ -88,6 +88,17 @@ document.addEventListener('DOMContentLoaded', () => {
     autoLogin();
 
     window.switchTab    = switchTab;
+    window.toggleBannerSound = toggleBannerSound;
+
+    // ===== BANNER SOUND =====
+    function toggleBannerSound() {
+        const video = document.getElementById('banner-video');
+        const icon  = document.getElementById('banner-sound-icon');
+        if (!video) return;
+        video.muted = !video.muted;
+        icon.textContent = video.muted ? 'volume_off' : 'volume_up';
+        if (!video.muted) video.play().catch(() => {});
+    }
     window.onShootTap   = onShootTap;
     window.openFaceSwap = openFaceSwap;
 
