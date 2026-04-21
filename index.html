@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="i18n.js"></script>
 </head>
 <body>
 
@@ -17,8 +18,8 @@
         <div class="top-bar-content">
             <div class="app-logo"><img src="assets/images/app_icon.jpg" alt="Logo"></div>
             <div class="title-container">
-                <span class="main-title">我是AI教练～</span>
-                <span class="sub-title">您的专属挥拍训练助手来啦！</span>
+                <span class="main-title" data-i18n="mainTitle">我是AI教练～</span>
+                <span class="sub-title" data-i18n="subTitle">您的专属挥拍训练助手来啦！</span>
             </div>
         </div>
     </div>
@@ -41,7 +42,7 @@
         <div class="scene-section">
             <div class="section-header">
                 <span class="material-icons section-icon">star</span>
-                <span class="section-title">场景推荐</span>
+                <span class="section-title" data-i18n="sectionScene">场景推荐</span>
             </div>
             <div class="grid-container" id="scene-grid"></div>
         </div>
@@ -50,10 +51,10 @@
         <div class="faceswap-section">
             <div class="section-header">
                 <span class="material-icons section-icon" style="color:#ff6b6b">face_retouching_natural</span>
-                <span class="section-title">成为运动主角</span>
+                <span class="section-title" data-i18n="sectionFaceSwap">成为运动主角</span>
                 <span class="faceswap-badge">AI</span>
             </div>
-            <p class="faceswap-desc">选一段模板，拍一张正脸，让 AI 把你带入运动大片</p>
+            <p class="faceswap-desc" data-i18n="faceSwapDesc">选一段模板，拍一张正脸，让 AI 把你带入运动大片</p>
             <div class="faceswap-grid">
                 <div class="faceswap-card" onclick="openFaceSwap(0)">
                     <div class="faceswap-video-wrap">
@@ -63,8 +64,8 @@
                         </div>
                     </div>
                     <div class="faceswap-card-footer">
-                        <span class="faceswap-card-title">模板一</span>
-                        <div class="faceswap-use-btn">使用</div>
+                        <span class="faceswap-card-title" data-i18n="template1">模板一</span>
+                        <div class="faceswap-use-btn" data-i18n="useBtn">使用</div>
                     </div>
                 </div>
                 <div class="faceswap-card" onclick="openFaceSwap(1)">
@@ -75,8 +76,8 @@
                         </div>
                     </div>
                     <div class="faceswap-card-footer">
-                        <span class="faceswap-card-title">模板二</span>
-                        <div class="faceswap-use-btn">使用</div>
+                        <span class="faceswap-card-title" data-i18n="template2">模板二</span>
+                        <div class="faceswap-use-btn" data-i18n="useBtn">使用</div>
                     </div>
                 </div>
                 <div class="faceswap-card" onclick="openFaceSwap(2)">
@@ -87,8 +88,8 @@
                         </div>
                     </div>
                     <div class="faceswap-card-footer">
-                        <span class="faceswap-card-title">模板三</span>
-                        <div class="faceswap-use-btn">使用</div>
+                        <span class="faceswap-card-title" data-i18n="template3">模板三</span>
+                        <div class="faceswap-use-btn" data-i18n="useBtn">使用</div>
                     </div>
                 </div>
                 <div class="faceswap-card" onclick="openFaceSwap(3)">
@@ -99,8 +100,8 @@
                         </div>
                     </div>
                     <div class="faceswap-card-footer">
-                        <span class="faceswap-card-title">模板四</span>
-                        <div class="faceswap-use-btn">使用</div>
+                        <span class="faceswap-card-title" data-i18n="template4">模板四</span>
+                        <div class="faceswap-use-btn" data-i18n="useBtn">使用</div>
                     </div>
                 </div>
             </div>
@@ -110,40 +111,40 @@
         <div class="more-sports-section">
             <div class="section-header">
                 <span class="material-icons section-icon">sports</span>
-                <span class="section-title">更多运动</span>
+                <span class="section-title" data-i18n="sectionMoreSports">更多运动</span>
             </div>
             <div class="more-sports-grid">
-                <div class="more-sports-item" onclick="showToast('开发中，敬请期待')">
+                <div class="more-sports-item" onclick="showToast(i18n.t('comingSoon'))">
                     <div class="more-sports-icon" style="background:#e0f7fa">🏊</div>
-                    <span class="more-sports-label">游泳</span>
+                    <span class="more-sports-label" data-i18n="sportSwim">游泳</span>
                 </div>
-                <div class="more-sports-item" onclick="showToast('开发中，敬请期待')">
+                <div class="more-sports-item" onclick="showToast(i18n.t('comingSoon'))">
                     <div class="more-sports-icon" style="background:#fce4ec">🏏</div>
-                    <span class="more-sports-label">板球</span>
+                    <span class="more-sports-label" data-i18n="sportCricket">板球</span>
                 </div>
-                <div class="more-sports-item" onclick="showToast('开发中，敬请期待')">
+                <div class="more-sports-item" onclick="showToast(i18n.t('comingSoon'))">
                     <div class="more-sports-icon" style="background:#e8f5e9">💪</div>
-                    <span class="more-sports-label">健身私教</span>
+                    <span class="more-sports-label" data-i18n="sportFitness">健身私教</span>
                 </div>
-                <div class="more-sports-item" onclick="showToast('开发中，敬请期待')">
+                <div class="more-sports-item" onclick="showToast(i18n.t('comingSoon'))">
                     <div class="more-sports-icon" style="background:#fff3e0">🏓</div>
-                    <span class="more-sports-label">匹克球</span>
+                    <span class="more-sports-label" data-i18n="sportPickleball">匹克球</span>
                 </div>
-                <div class="more-sports-item" onclick="showToast('开发中，敬请期待')">
+                <div class="more-sports-item" onclick="showToast(i18n.t('comingSoon'))">
                     <div class="more-sports-icon" style="background:#f3e5f5">🏓</div>
-                    <span class="more-sports-label">乒乓球</span>
+                    <span class="more-sports-label" data-i18n="sportTableTennis">乒乓球</span>
                 </div>
-                <div class="more-sports-item" onclick="showToast('开发中，敬请期待')">
+                <div class="more-sports-item" onclick="showToast(i18n.t('comingSoon'))">
                     <div class="more-sports-icon" style="background:#e8eaf6">🏸</div>
-                    <span class="more-sports-label">羽毛球</span>
+                    <span class="more-sports-label" data-i18n="sportBadminton">羽毛球</span>
                 </div>
-                <div class="more-sports-item" onclick="showToast('开发中，敬请期待')">
+                <div class="more-sports-item" onclick="showToast(i18n.t('comingSoon'))">
                     <div class="more-sports-icon" style="background:#fff8e1">🧘</div>
-                    <span class="more-sports-label">普拉提</span>
+                    <span class="more-sports-label" data-i18n="sportPilates">普拉提</span>
                 </div>
-                <div class="more-sports-item" onclick="showToast('开发中，敬请期待')">
+                <div class="more-sports-item" onclick="showToast(i18n.t('comingSoon'))">
                     <div class="more-sports-icon" style="background:#e0f2f1">⛳</div>
-                    <span class="more-sports-label">高尔夫</span>
+                    <span class="more-sports-label" data-i18n="sportGolf">高尔夫</span>
                 </div>
             </div>
         </div>
@@ -161,9 +162,9 @@
         <div class="app-bar-left">
             <span class="material-icons back-btn" id="back-btn">arrow_back_ios</span>
         </div>
-        <div class="app-bar-title">挥拍分析</div>
+        <div class="app-bar-title" data-i18n="analysisTitle">挥拍分析</div>
         <div class="app-bar-right">
-            <div class="share-btn" id="share-btn">分享</div>
+            <div class="share-btn" id="share-btn" data-i18n="shareBtn">分享</div>
         </div>
     </div>
     <div class="scroll-content analysis-content">
@@ -178,14 +179,14 @@
         <!-- 加载状态 -->
         <div id="loading-state" class="analysis-loading-card">
             <div class="analysis-spinner"></div>
-            <div class="analysis-loading-label">AI 教练分析中<span id="loading-percent" class="analysis-loading-percent">0%</span></div>
+            <div class="analysis-loading-label"><span data-i18n="aiAnalyzing">AI 教练分析中</span><span id="loading-percent" class="analysis-loading-percent">0%</span></div>
             <div class="progress-track analysis-progress-track"><div class="progress-fill" id="progress-bar"></div></div>
-            <div class="analysis-loading-hint">请稍候，通常需要 10~30 秒</div>
+            <div class="analysis-loading-hint" data-i18n="analysisHint">请稍候，通常需要 10~30 秒</div>
         </div>
         <!-- 空状态 -->
         <div id="empty-state" class="center-state hidden">
             <span class="material-icons" style="font-size:56px;color:#ddd;margin-bottom:12px">sports_tennis</span>
-            <div class="empty-text">暂无分析结果</div>
+            <div class="empty-text" data-i18n="noResult">暂无分析结果</div>
         </div>
         <!-- 结果 -->
         <div id="result-content" class="analysis-result-card markdown-body hidden"></div>
@@ -201,32 +202,32 @@
     <div class="scroll-content me-scroll">
         <div style="height:16px"></div>
         <div class="me-func-group">
-            <div class="me-func-item" onclick="window.open('https://tennis.gzheyu.com.cn/pages/iSwingCoach/iSwingCoachText2','_blank')">
+            <div class="me-func-item" onclick="window.open('https://sports.gzheyu.com.cn/pages/iSwingCoach/iSwingCoachPP','_blank')">
                 <div class="me-func-icon" style="background:#e8f5e9">
                     <span class="material-icons" style="font-size:20px;color:#4caf50">lock</span>
                 </div>
-                <span class="me-func-title">隐私政策</span>
+                <span class="me-func-title" data-i18n="privacyPolicy">隐私政策</span>
                 <span class="material-icons me-func-arrow">keyboard_arrow_right</span>
             </div>
-            <div class="me-func-item" onclick="window.open('https://tennis.gzheyu.com.cn/','_blank')">
+            <div class="me-func-item" onclick="window.open('https://sports.gzheyu.com.cn/pages/iSwingCoach/iSwingCoachSCL','_blank')">
                 <div class="me-func-icon" style="background:#e3f2fd">
-                    <span class="material-icons" style="font-size:20px;color:#2196f3">info</span>
+                    <span class="material-icons" style="font-size:20px;color:#2196f3">gavel</span>
                 </div>
-                <span class="me-func-title">关于我们</span>
+                <span class="me-func-title" data-i18n="specialLaw">特商法</span>
                 <span class="material-icons me-func-arrow">keyboard_arrow_right</span>
             </div>
-            <div class="me-func-item" onclick="window.open('https://tennis.gzheyu.com.cn/pages/iSwingCoach/iSwingCoachText1','_blank')">
+            <div class="me-func-item" onclick="window.open('https://sports.gzheyu.com.cn/pages/iSwingCoach/iSwingCoachUA','_blank')">
                 <div class="me-func-icon" style="background:#fff3e0">
                     <span class="material-icons" style="font-size:20px;color:#ff9800">description</span>
                 </div>
-                <span class="me-func-title">用户协议</span>
+                <span class="me-func-title" data-i18n="userAgreement">用户协议</span>
                 <span class="material-icons me-func-arrow">keyboard_arrow_right</span>
             </div>
             <div class="me-func-item">
                 <div class="me-func-icon" style="background:#fff8e1">
                     <span class="material-icons" style="font-size:20px;color:#ffb300">more_horiz</span>
                 </div>
-                <span class="me-func-title">更多运动，敬请期待</span>
+                <span class="me-func-title" data-i18n="moreComingSoon">更多运动，敬请期待</span>
                 <span class="material-icons me-func-arrow">keyboard_arrow_right</span>
             </div>
         </div>
@@ -239,7 +240,7 @@
         <div class="app-bar-left">
             <span class="material-icons back-btn" id="faceswap-back-btn">arrow_back_ios</span>
         </div>
-        <div class="app-bar-title">AI 运动写真</div>
+        <div class="app-bar-title" data-i18n="faceSwapTitle">AI 运动写真</div>
         <div class="app-bar-right"></div>
     </div>
     <div class="scroll-content" style="padding-bottom:50px">
@@ -248,22 +249,22 @@
         <div class="fs-dual-row">
             <!-- 左：模板视频 -->
             <div class="fs-dual-col">
-                <div class="fs-col-label">当前模板</div>
+                <div class="fs-col-label" data-i18n="currentTemplate">当前模板</div>
                 <div class="fs-tpl-box">
                     <video id="faceswap-tpl-video" muted loop playsinline
                         style="width:100%;height:100%;object-fit:cover;border-radius:12px;display:block;"></video>
-                    <div class="fs-tpl-tag">模板预览</div>
+                    <div class="fs-tpl-tag" data-i18n="templatePreview">模板预览</div>
                 </div>
             </div>
             <!-- 右：上传人脸 -->
             <div class="fs-dual-col">
-                <div class="fs-col-label">上传人脸照片</div>
+                <div class="fs-col-label" data-i18n="uploadFacePhoto">上传人脸照片</div>
                 <div class="fs-upload-box" id="faceswap-upload-box">
                     <img id="faceswap-photo-preview" src="" alt=""
                         style="display:none;width:100%;height:100%;object-fit:cover;border-radius:12px;">
                     <div id="faceswap-upload-placeholder">
                         <span class="material-icons" style="font-size:32px;color:#ccc">add_photo_alternate</span>
-                        <div class="fs-upload-hint">点击上传</div>
+                        <div class="fs-upload-hint" data-i18n="clickUpload">点击上传</div>
                         <div class="fs-upload-sub">JPG / PNG</div>
                     </div>
                 </div>
@@ -273,42 +274,42 @@
         <!-- 提示 -->
         <div class="faceswap-tips">
             <span class="material-icons" style="font-size:14px;margin-right:4px;flex-shrink:0">info_outline</span>
-            <span>请确保照片中只有一张人脸，五官清晰，正脸角度偏侧不超过 30°</span>
+            <span data-i18n="faceTips">请确保照片中只有一张人脸，五官清晰，正脸角度偏侧不超过 30°</span>
         </div>
 
         <!-- 提交按钮 -->
         <div style="margin:20px 16px 0;">
-            <div class="faceswap-submit-btn" id="faceswap-submit-btn">开始生成</div>
+            <div class="faceswap-submit-btn" id="faceswap-submit-btn" data-i18n="startGenerate">开始生成</div>
         </div>
 
         <!-- 进度 -->
         <div id="faceswap-progress" class="hidden" style="margin:24px 16px 0;text-align:center;">
-            <div style="font-size:15px;color:#555;margin-bottom:12px" id="faceswap-progress-text">AI 合成中，请稍候...</div>
+            <div style="font-size:15px;color:#555;margin-bottom:12px" id="faceswap-progress-text" data-i18n="synthesizing">AI 合成中，请稍候...</div>
             <div class="progress-track" style="width:80%;margin:0 auto;">
                 <div class="progress-fill" id="faceswap-progress-bar" style="background:var(--primary-color);"></div>
             </div>
-            <div style="font-size:12px;color:#aaa;margin-top:8px">视频合成通常需要 1~3 分钟</div>
+            <div style="font-size:12px;color:#aaa;margin-top:8px" data-i18n="synthesisTime">视频合成通常需要 1~3 分钟</div>
         </div>
 
         <!-- 结果 -->
         <div id="faceswap-result" class="hidden" style="margin:16px 16px 0;">
-            <div style="font-size:13px;color:#888;margin-bottom:8px;">合成结果</div>
+            <div style="font-size:13px;color:#888;margin-bottom:8px;" data-i18n="synthesisResult">合成结果</div>
             <div style="border-radius:12px;overflow:hidden;background:#000;">
                 <video id="faceswap-result-video" controls playsinline
                     style="width:100%;display:block;max-height:320px;object-fit:contain;"></video>
             </div>
             <div style="display:flex;gap:10px;margin-top:12px;">
-                <div class="faceswap-action-btn faceswap-action-outline" id="faceswap-reset-btn">重新生成</div>
-                <div class="faceswap-action-btn faceswap-action-primary" id="faceswap-download-btn">保存视频</div>
+                <div class="faceswap-action-btn faceswap-action-outline" id="faceswap-reset-btn" data-i18n="regenerate">重新生成</div>
+                <div class="faceswap-action-btn faceswap-action-primary" id="faceswap-download-btn" data-i18n="saveVideo">保存视频</div>
             </div>
         </div>
 
         <!-- 失败 -->
         <div id="faceswap-error" class="hidden" style="margin:24px 16px 0;text-align:center;">
             <span class="material-icons" style="font-size:48px;color:#f44336;display:block;margin-bottom:8px;">error_outline</span>
-            <div style="font-size:15px;color:#f44336;margin-bottom:4px">生成失败</div>
-            <div style="font-size:13px;color:#aaa;margin-bottom:16px" id="faceswap-error-msg">请检查网络后重试</div>
-            <div class="faceswap-submit-btn" id="faceswap-retry-btn">重新尝试</div>
+            <div style="font-size:15px;color:#f44336;margin-bottom:4px" data-i18n="generateFailed">生成失败</div>
+            <div style="font-size:13px;color:#aaa;margin-bottom:16px" id="faceswap-error-msg" data-i18n="checkNetwork">请检查网络后重试</div>
+            <div class="faceswap-submit-btn" id="faceswap-retry-btn" data-i18n="retryGenerate">重新尝试</div>
         </div>
     </div>
 </div>
@@ -317,15 +318,15 @@
 <div class="bottom-tab-bar" id="bottom-tab-bar">
     <div class="tab-item active" id="tab-home" onclick="switchTab('home')">
         <span class="material-icons tab-icon">home</span>
-        <span class="tab-label">首页</span>
+        <span class="tab-label" data-i18n="tabHome">首页</span>
     </div>
     <div class="tab-item tab-center-wrap" onclick="onShootTap()">
         <div class="shoot-btn"><div class="shoot-btn-inner"></div></div>
-        <span class="tab-label" style="margin-top:8px">拍摄分析</span>
+        <span class="tab-label" style="margin-top:8px" data-i18n="tabShoot">拍摄分析</span>
     </div>
     <div class="tab-item" id="tab-me" onclick="switchTab('me')">
         <span class="material-icons tab-icon">person</span>
-        <span class="tab-label">我的</span>
+        <span class="tab-label" data-i18n="tabMe">我的</span>
     </div>
 </div>
 
