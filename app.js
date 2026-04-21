@@ -16,12 +16,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // 模板列表（动态从接口加载，格式：[{ id, video_url, cover_url }]）
     let templateList = [];
 
-    const sceneTypes = [
-        { title: '在家挥拍', subtitle: '适配客厅/卧室的轻量训练', desc: 'HOME', color: '#fff1b3' },
-        { title: '个人练习', subtitle: '强化节奏与动作连贯性',    desc: 'SOLO', color: '#dff7f5' },
-        { title: '亲子陪练', subtitle: '亲子互动，轻松入门',       desc: 'FAM',  color: '#e8f5e9' },
-        { title: '双人对打', subtitle: '提升反应与对抗强度',       desc: 'DUO',  color: '#ffe9e9' }
-    ];
+    // i18n 快捷引用
+    const t = window.i18n.t;
+
+    function getSceneTypes() {
+        return [
+            { title: t('sceneHome'), subtitle: t('sceneHomeSub'), desc: 'HOME', color: '#fff1b3' },
+            { title: t('sceneSolo'), subtitle: t('sceneSoloSub'), desc: 'SOLO', color: '#dff7f5' },
+            { title: t('sceneFam'),  subtitle: t('sceneFamSub'),  desc: 'FAM',  color: '#e8f5e9' },
+            { title: t('sceneDuo'),  subtitle: t('sceneDuoSub'),  desc: 'DUO',  color: '#ffe9e9' }
+        ];
+    }
 
     // ===================== DOM =====================
     const pageHome      = document.getElementById('page-home');
@@ -83,7 +88,23 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     // ===================== INIT =====================
-    renderSceneGrid();
+    // 先检测语言，再渲染 UI
+    console.log('[app] 开始初始化，调用 detectLanguage...');
+    window.i18n.detectLanguage().then(function() {
+        console.log('[app] 语言检测完成, lang:', window.i18n.getLang(), '| type:', window.i18n.getAnalysisType());
+        window.i18n.applyI18n();  // 替换所有 data-i18n 静态文本
+        renderSceneGrid();         // 场景卡片需要动态生成
+        // 替换 banner 视频
+        var bannerVideo = document.getElementById('banner-video');
+        if (bannerVideo) {
+            var src = window.i18n.getBannerVideo();
+            console.log('[app] 切换 banner 视频:', src);
+            bannerVideo.src = src;
+            bannerVideo.load();
+            bannerVideo.play().catch(function() {});
+        }
+        console.log('[app] UI 渲染完成');
+    });
     bindFaceSwapCardHover();
     autoLogin();
 
@@ -190,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===================== SCENE GRID =====================
     function renderSceneGrid() {
         sceneGrid.innerHTML = '';
-        sceneTypes.forEach(scene => {
+        getSceneTypes().forEach(scene => {
             const card = document.createElement('div');
             card.className = 'scene-card';
             card.innerHTML =
@@ -209,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!e.target.files.length) return;
         const file = e.target.files[0];
         if (file.type.startsWith('video/')) { currentVideoFile = file; navigateToAnalysis(); }
-        else alert('请选择有效的视频文件');
+        else alert(t('invalidVideo'));
         videoInput.value = '';
     });
 
@@ -244,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resultContent.classList.add('hidden');
         emptyState.classList.add('hidden');
         progressBar.style.width = '0%';
-        if (loadingTextEl) loadingTextEl.innerHTML = '准备上传... <span id="loading-percent">0%</span>';
+        if (loadingTextEl) loadingTextEl.innerHTML = t('preparing') + ' <span id="loading-percent">0%</span>';
         resultContent.innerHTML = '';
     }
 
@@ -252,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentVideoFile) return;
         const formData = new FormData();
         formData.append('video', currentVideoFile);
-        formData.append('type', 'tennis');
+        formData.append('type', window.i18n.getAnalysisType());
         const CancelToken = axios.CancelToken;
         cancelTokenSource = CancelToken.source();
 
@@ -265,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const el = document.getElementById('loading-percent');
             if (el) el.textContent = v + '%';
             progressBar.style.width = v + '%';
-            if (uploadProgress === 100 && loadingTextEl) loadingTextEl.textContent = 'AI 正在分析动作...';
+            if (uploadProgress === 100 && loadingTextEl) loadingTextEl.textContent = t('aiAnalyzingAction');
         }, 50);
 
         try {
@@ -279,22 +300,22 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.data && res.data.code === 200) {
                 const d = res.data.data;
                 let content = typeof d === 'string' ? d : (d && (d.content || d.result || d.markdown)) || res.data.message || '';
-                setTimeout(() => renderResult(content || '解析后内容为空'), 300);
+                setTimeout(() => renderResult(content || t('emptyContent')), 300);
             } else {
-                throw new Error((res.data && res.data.message) || '服务器返回错误');
+                throw new Error((res.data && res.data.message) || t('serverError'));
             }
         } catch (err) {
             clearInterval(iv);
             if (!axios.isCancel(err)) {
                 loadingState.classList.add('hidden');
                 emptyState.classList.remove('hidden');
-                emptyState.innerHTML = '<div class="empty-text" style="color:red">分析失败<br><span style="font-size:14px;color:#666">' + (err.message||'网络错误') + '</span></div><button style="margin-top:20px;padding:10px 20px;background:var(--primary-color);border:none;border-radius:100px;font-weight:bold;cursor:pointer" onclick="location.reload()">重试</button>';
+                emptyState.innerHTML = '<div class="empty-text" style="color:red">' + t('analysisFailed') + '<br><span style="font-size:14px;color:#666">' + (err.message||t('networkError')) + '</span></div><button style="margin-top:20px;padding:10px 20px;background:var(--primary-color);border:none;border-radius:100px;font-weight:bold;cursor:pointer" onclick="location.reload()">' + t('retryBtn') + '</button>';
             }
         }
     }
 
     function renderResult(md) {
-        if (md == null) md = '分析结果为空';
+        if (md == null) md = t('resultEmpty');
         if (typeof md !== 'string') { try { md = JSON.stringify(md, null, 2); } catch(e) { md = String(md); } }
         loadingState.classList.add('hidden');
         resultContent.classList.remove('hidden');
@@ -364,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
     facePhotoInput.addEventListener('change', e => {
         if (!e.target.files.length) return;
         const file = e.target.files[0];
-        if (!file.type.startsWith('image/')) { showToast('请选择 JPG 或 PNG 图片'); return; }
+        if (!file.type.startsWith('image/')) { showToast(t('selectImage')); return; }
         facePhotoFile = file;
         photoPreview.src = URL.createObjectURL(file);
         photoPreview.style.display = 'block';
@@ -374,13 +395,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 提交按钮 —— 对照 generatePhoto 函数
     submitBtn.addEventListener('click', async () => {
-        if (!facePhotoFile) { showToast('请先上传人脸照片'); return; }
+        if (!facePhotoFile) { showToast(t('uploadFaceFirst')); return; }
         if (submitBtn.classList.contains('disabled')) return;
 
         submitBtn.classList.add('disabled');
-        submitBtn.textContent = '上传图片中...';
+        submitBtn.textContent = t('uploadingImage');
         progressEl.classList.remove('hidden');
-        progressText.textContent = '正在上传人脸图片...';
+        progressText.textContent = t('uploadingFace');
         errorEl.classList.add('hidden');
         resultEl.classList.add('hidden');
         fakeProgressStart();
@@ -392,8 +413,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('[faceSwap] Step1: 开始上传图片到OSS, userId:', userId, '| file:', facePhotoFile.name, facePhotoFile.size, 'bytes');
             const imageUrl = await uploadImgToOss(facePhotoFile);
             console.log('[faceSwap] Step1: OSS上传成功, imageUrl:', imageUrl);
-            progressText.textContent = 'AI 合成中，请稍候...';
-            submitBtn.textContent = '生成中...';
+            progressText.textContent = t('synthesizing');
+            submitBtn.textContent = t('generating');
 
             // Step2: 提交换脸任务（对应 generatePhoto，type 传 ""）
             const submitPayload = {
@@ -416,10 +437,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Step3: 轮询结果（对应 photoTrain）
                 photoTrain(faceSwapRequestId);
             } else {
-                throw new Error((submitRes.data && submitRes.data.message) || '任务提交失败');
+                throw new Error((submitRes.data && submitRes.data.message) || t('submitFailed'));
             }
         } catch (err) {
-            showFaceSwapError(err.message || '网络请求失败，请重试');
+            showFaceSwapError(err.message || t('networkRequestFailed'));
         }
     });
 
@@ -440,7 +461,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!res.data || res.data.code !== 200) {
                 console.error('[photoTrain] 接口异常, code:', res.data && res.data.code, '| message:', res.data && res.data.message);
-                showFaceSwapError('查询失败：' + (res.data && res.data.message || '服务器返回异常'));
+                showFaceSwapError(t('queryFailed') + (res.data && res.data.message || t('serverError')));
                 return;
             }
 
@@ -461,7 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log('[photoTrain] 重试第', retryCount, '次...');
                     faceSwapPollTimer = setTimeout(() => photoTrain(requestId), 2000);
                 } else {
-                    showFaceSwapError('合成失败，请重试（status: ' + status + '）');
+                    showFaceSwapError(t('synthesisFailed') + '（status: ' + status + '）');
                 }
             }
         } catch(e) {
@@ -472,7 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log('[photoTrain] 异常后重试第', retryCount, '次...');
                     faceSwapPollTimer = setTimeout(() => photoTrain(requestId), 2000);
                 } else {
-                    showFaceSwapError('网络异常：' + e.message);
+                    showFaceSwapError(t('networkException') + e.message);
                 }
             }
         }
@@ -503,7 +524,7 @@ document.addEventListener('DOMContentLoaded', () => {
             resultEl.classList.remove('hidden');
             resultVideo.src = url; resultVideo.load();
         }, 400);
-        submitBtn.textContent = '已生成';
+        submitBtn.textContent = t('generated');
     }
 
     function showFaceSwapError(msg) {
@@ -512,7 +533,7 @@ document.addEventListener('DOMContentLoaded', () => {
         errorEl.classList.remove('hidden');
         errorMsg.textContent = msg;
         submitBtn.classList.remove('disabled');
-        submitBtn.textContent = '开始生成';
+        submitBtn.textContent = t('startGenerate');
     }
 
     function faceSwapResetState() {
@@ -521,7 +542,7 @@ document.addEventListener('DOMContentLoaded', () => {
         facePhotoFile = null; faceSwapRequestId = null; faceSwapResultUrl = '';
         photoPreview.src = ''; photoPreview.style.display = 'none';
         uploadPlaceholder.style.display = 'flex';
-        submitBtn.classList.remove('disabled'); submitBtn.textContent = '开始生成';
+        submitBtn.classList.remove('disabled'); submitBtn.textContent = t('startGenerate');
         progressEl.classList.add('hidden');
         resultEl.classList.add('hidden');
         errorEl.classList.add('hidden');
