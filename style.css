@@ -435,6 +435,25 @@ body {
     gap: 4px;
 }
 
+/* 底部公司信息 */
+.me-footer {
+    margin-top: 32px;
+    padding-bottom: 24px;
+    text-align: center;
+}
+.me-footer-company {
+    font-size: 12px;
+    color: #bbb;
+    margin-bottom: 6px;
+}
+.me-footer-icp {
+    font-size: 11px;
+    color: #ccc;
+    text-decoration: none;
+    display: inline-block;
+}
+.me-footer-icp:active { opacity: 0.7; }
+
 .me-vip-badge {
     display: flex;
     align-items: center;
