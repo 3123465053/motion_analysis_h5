@@ -10,8 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const TEMPLATES_URL       = 'http://myapi.ai-face.ai/api/v4/AiModule/MergeVideoFace/GetTemplates'; // 获取换脸模板列表
     const TEMPLATES_STYLE_ID  = 14; // Face Swap 分类
     const LOGIN_URL        = BASE_URL + '/couple/user/thirdparty/login';
+    const SEND_CODE_URL    = BASE_URL + '/couple/user/email/send-code';
     const TOKEN_KEY        = 'couple-token';
     const DEVICE_ID_KEY    = 'h5-device-id';
+    const USER_EMAIL_KEY   = 'h5-user-email';
+    const USER_NICK_KEY    = 'h5-user-nickname';
+    const LOGIN_TYPE_KEY   = 'h5-login-type';
 
     // 模板列表（动态从接口加载，格式：[{ id, video_url, cover_url }]）
     let templateList = [];
@@ -107,11 +111,29 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     bindFaceSwapCardHover();
     autoLogin();
+    bindLoginUI();
+    refreshProfileUI();
+    bindWaterUI();
+    bindPlanUI();
+    bindTutorialUI();
 
-    window.switchTab    = switchTab;
+    window.switchTab         = switchTab;
     window.toggleBannerSound = toggleBannerSound;
     window.toggleBannerPlay  = toggleBannerPlay;
-    window.showToast          = showToast;
+    window.showToast         = showToast;
+    window.onProfileTap      = onProfileTap;
+    window.openVipPage       = openVipPage;
+    window.onVipPlanTap      = onVipPlanTap;
+    window.onVipPayTap       = onVipPayTap;
+    window.openTutorialPage  = openTutorialPage;
+    window.openWaterPage     = openWaterPage;
+    window.openPlanPage      = openPlanPage;
+    window.switchPlanTab     = switchPlanTab;
+    window.togglePlan        = togglePlan;
+    window.deletePlan        = deletePlan;
+    window.closePlanModal    = closePlanModal;
+    window.savePlan          = savePlan;
+    window.closeFeaturePage  = closeFeaturePage;
 
     // ===== BANNER CONTROLS =====
     let bannerPlayOverlayTimer = null;
@@ -206,7 +228,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('tab-home').classList.toggle('active', tab === 'home');
         document.getElementById('tab-me').classList.toggle('active',   tab === 'me');
     }
-    function onShootTap() { videoInput.click(); }
+    function onShootTap() {
+        if (!isLoggedIn()) { openLoginModal(); return; }
+        videoInput.click();
+    }
 
     // ===================== SCENE GRID =====================
     function renderSceneGrid() {
@@ -220,7 +245,10 @@ document.addEventListener('DOMContentLoaded', () => {
                   '<span class="card-subtitle">' + scene.subtitle + '</span>' +
                 '</div>' +
                 '<div class="card-badge" style="background:' + scene.color + '">' + scene.desc + '</div>';
-            card.addEventListener('click', () => videoInput.click());
+            card.addEventListener('click', () => {
+                if (!isLoggedIn()) { openLoginModal(); return; }
+                videoInput.click();
+            });
             sceneGrid.appendChild(card);
         });
     }
@@ -665,4 +693,659 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => toast.classList.remove('show'), 2000);
     }
 
+    // ===================== EMAIL LOGIN =====================
+    function isLoggedIn() {
+        return !!localStorage.getItem(USER_EMAIL_KEY) && localStorage.getItem(LOGIN_TYPE_KEY) === 'email';
+    }
+
+    function refreshProfileUI() {
+        const nameEl   = document.getElementById('me-profile-name');
+        const subEl    = document.getElementById('me-profile-sub');
+        const iconEl   = document.getElementById('me-profile-avatar-icon');
+        const imgEl    = document.getElementById('me-profile-avatar-img');
+        if (!nameEl) return;
+        if (isLoggedIn()) {
+            const email    = localStorage.getItem(USER_EMAIL_KEY) || '';
+            const nickname = localStorage.getItem(USER_NICK_KEY) || email.split('@')[0];
+            // 已登录时移除 data-i18n，避免 applyI18n 覆盖用户数据
+            nameEl.removeAttribute('data-i18n');
+            subEl.removeAttribute('data-i18n');
+            nameEl.textContent = nickname;
+            subEl.textContent  = email;
+            if (iconEl) iconEl.textContent = 'person';
+        } else {
+            nameEl.setAttribute('data-i18n', 'tapToLogin');
+            subEl.setAttribute('data-i18n', 'loginHint');
+            nameEl.textContent = t('tapToLogin');
+            subEl.textContent  = t('loginHint');
+            if (iconEl) iconEl.textContent = 'person';
+            if (imgEl) { imgEl.src = ''; imgEl.style.display = 'none'; }
+        }
+    }
+
+    function onProfileTap() {
+        if (isLoggedIn()) {
+            document.getElementById('logout-mask').classList.remove('hidden');
+        } else {
+            openLoginModal();
+        }
+    }
+
+    function openLoginModal() {
+        const mask = document.getElementById('login-mask');
+        const err  = document.getElementById('login-error');
+        const btn  = document.getElementById('login-submit-btn');
+        err.classList.add('hidden'); err.textContent = '';
+        btn.classList.remove('disabled');
+        btn.textContent = t('loginBtn');
+        document.getElementById('login-email').value = '';
+        document.getElementById('login-code').value  = '';
+        mask.classList.remove('hidden');
+        setTimeout(() => { document.getElementById('login-email').focus(); }, 100);
+    }
+
+    function closeLoginModal() {
+        document.getElementById('login-mask').classList.add('hidden');
+    }
+
+    function bindLoginUI() {
+        const mask      = document.getElementById('login-mask');
+        const closeBtn  = document.getElementById('login-close-btn');
+        const codeInput = document.getElementById('login-code');
+        const sendBtn   = document.getElementById('login-send-code-btn');
+        const submit    = document.getElementById('login-submit-btn');
+
+        closeBtn.addEventListener('click', closeLoginModal);
+        mask.addEventListener('click', e => { if (e.target === mask) closeLoginModal(); });
+
+        sendBtn.addEventListener('click', handleSendCode);
+        submit.addEventListener('click', handleEmailLogin);
+        codeInput.addEventListener('keypress', e => { if (e.key === 'Enter') handleEmailLogin(); });
+
+        // 退出登录
+        const logoutMask   = document.getElementById('logout-mask');
+        const logoutCancel = document.getElementById('logout-cancel-btn');
+        const logoutOk     = document.getElementById('logout-ok-btn');
+        logoutCancel.addEventListener('click', () => logoutMask.classList.add('hidden'));
+        logoutMask.addEventListener('click', e => { if (e.target === logoutMask) logoutMask.classList.add('hidden'); });
+        logoutOk.addEventListener('click', () => {
+            localStorage.removeItem(USER_EMAIL_KEY);
+            localStorage.removeItem(USER_NICK_KEY);
+            localStorage.removeItem(LOGIN_TYPE_KEY);
+            localStorage.removeItem(TOKEN_KEY);
+            localStorage.setItem('h5-user-id', '0');
+            logoutMask.classList.add('hidden');
+            refreshProfileUI();
+            showToast(t('logoutSuccess'));
+            autoLogin();
+        });
+
+        // VIP 页返回
+        const vipBack = document.getElementById('vip-back-btn');
+        if (vipBack) vipBack.addEventListener('click', closeVipPage);
+    }
+
+    async function handleSendCode() {
+        const emailEl = document.getElementById('login-email');
+        const errEl   = document.getElementById('login-error');
+        const sendBtn = document.getElementById('login-send-code-btn');
+        const email   = (emailEl.value || '').trim();
+
+        errEl.classList.add('hidden');
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            errEl.textContent = t('loginEmailInvalid');
+            errEl.classList.remove('hidden');
+            return;
+        }
+
+        sendBtn.classList.add('disabled');
+        sendBtn.textContent = t('sendCodeLoading');
+
+        try {
+            const res = await axios.post(SEND_CODE_URL, {
+                email: email,
+                appId: 'com.tennis.h5'
+            }, { timeout: 15000, validateStatus: () => true });
+
+            if (res.data && res.data.code === 200) {
+                let countdown = 60;
+                const tick = () => {
+                    sendBtn.textContent = t('sendCodeCooldown').replace('{s}', countdown);
+                    if (--countdown < 0) {
+                        sendBtn.classList.remove('disabled');
+                        sendBtn.textContent = t('sendCode');
+                    } else {
+                        setTimeout(tick, 1000);
+                    }
+                };
+                tick();
+                document.getElementById('login-code').focus();
+            } else {
+                sendBtn.classList.remove('disabled');
+                sendBtn.textContent = t('sendCode');
+                errEl.textContent = t('sendCodeFailed');
+                errEl.classList.remove('hidden');
+            }
+        } catch (e) {
+            console.warn('[sendCode] failed:', e.message);
+            sendBtn.classList.remove('disabled');
+            sendBtn.textContent = t('sendCode');
+            errEl.textContent = t('sendCodeFailed');
+            errEl.classList.remove('hidden');
+        }
+    }
+
+    async function handleEmailLogin() {
+        const emailEl = document.getElementById('login-email');
+        const codeEl  = document.getElementById('login-code');
+        const errEl   = document.getElementById('login-error');
+        const btn     = document.getElementById('login-submit-btn');
+        const email   = (emailEl.value || '').trim();
+        const code    = (codeEl.value || '').trim();
+
+        errEl.classList.add('hidden');
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            errEl.textContent = t('loginEmailInvalid');
+            errEl.classList.remove('hidden');
+            return;
+        }
+        if (!code) {
+            errEl.textContent = t('loginCodeInvalid');
+            errEl.classList.remove('hidden');
+            return;
+        }
+
+        btn.classList.add('disabled');
+        btn.textContent = t('loginLoading');
+
+        try {
+            const res = await axios.post(LOGIN_URL, {
+                oauthType: 'email',
+                email: email,
+                code: code,
+                appId: 'com.tennis.h5',
+                createdDevice: 3,
+                appAccountToken: getOrCreateDeviceId()
+            }, { timeout: 15000, validateStatus: () => true });
+
+            if (res.data && res.data.code === 200 && res.data.data) {
+                const d = res.data.data;
+                if (d.token) localStorage.setItem(TOKEN_KEY, d.token);
+                const uid = (d.userInfo && (d.userInfo.id || d.userInfo.userId)) || d.id || 0;
+                localStorage.setItem('h5-user-id', String(uid));
+                const nickname = (d.userInfo && (d.userInfo.nickname || d.userInfo.nickName)) || email.split('@')[0];
+                localStorage.setItem(USER_EMAIL_KEY, email);
+                localStorage.setItem(USER_NICK_KEY, nickname);
+                localStorage.setItem(LOGIN_TYPE_KEY, 'email');
+                closeLoginModal();
+                refreshProfileUI();
+                showToast(t('loginSuccess'));
+            } else {
+                errEl.textContent = res.data && res.data.msg ? res.data.msg : t('loginFailed');
+                errEl.classList.remove('hidden');
+            }
+        } catch (e) {
+            console.warn('[emailLogin] failed:', e.message);
+            errEl.textContent = t('loginFailed');
+            errEl.classList.remove('hidden');
+        } finally {
+            btn.classList.remove('disabled');
+            btn.textContent = t('loginBtn');
+        }
+    }
+
+    // ===================== VIP PAGE =====================
+    function openVipPage() {
+        const page = document.getElementById('page-vip');
+        page.classList.remove('hidden');
+        setTimeout(() => page.classList.add('active'), 10);
+        bottomNav.style.display = 'none';
+    }
+
+    function closeVipPage() {
+        const page = document.getElementById('page-vip');
+        page.classList.remove('active');
+        setTimeout(() => page.classList.add('hidden'), 300);
+        bottomNav.style.display = 'flex';
+    }
+
+    // VIP 套餐选中状态
+    let selectedVipPlan = 'sub'; // 'sub' | 'once'
+    function onVipPlanTap(plan) {
+        selectedVipPlan = plan;
+        document.getElementById('vip-card-sub').classList.toggle('vip-plan-highlight', plan === 'sub');
+        document.getElementById('vip-card-once').classList.toggle('vip-plan-highlight', plan === 'once');
+    }
+
+    function onVipPayTap() {
+        showToast(t('featureInDev'));
+    }
+
+    // ===================== 通用页面切换工具 =====================
+    function openFeaturePage(pageId) {
+        const page = document.getElementById(pageId);
+        page.classList.remove('hidden');
+        setTimeout(() => page.classList.add('active'), 10);
+        bottomNav.style.display = 'none';
+    }
+    function closeFeaturePage(pageId) {
+        const page = document.getElementById(pageId);
+        page.classList.remove('active');
+        setTimeout(() => page.classList.add('hidden'), 300);
+        bottomNav.style.display = 'flex';
+    }
+
+    // ===================== 运动教程 =====================
+    const IMG = 'https://images.unsplash.com/photo-';
+    const TUTORIALS = [
+        { id: 1, emoji: '🎾', title: '网球正手击球技术详解', desc: '从握拍到随挥的完整动作分解', memberOnly: false,
+          coverImg: IMG + '1554068865-24cecd4e34b8?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '一、握拍方式', img: IMG + '1516688800765-3cc4d9aead55?w=700&h=320&fit=crop&q=80',
+              content: '东方式握拍是初学者最推荐的握拍方式，将手掌置于拍柄的右侧斜面，拇指和食指形成"V"形，其余手指自然环握。握拍力度适中，过紧会导致手腕僵硬，影响击球的灵活性。' },
+            { title: '二、准备姿势', content: '双脚分开与肩同宽，膝盖微弯，重心略微前倾。非持拍手托住球拍喉部，保持放松状态。眼睛始终盯住来球。' },
+            { title: '三、引拍动作', content: '当判断来球为正手时，立即向右侧转体，同时右手向右后方引拍。引拍时球拍头低于腰部，为击球创造向上的加速路径。' },
+            { title: '四、击球时机', img: IMG + '1587280501635-68a0e82cd5ff?w=700&h=320&fit=crop&q=80',
+              content: '最佳击球点在身体前方约一个手臂距离处，高度在腰部到肩部之间。击球时重心从右脚转移至左脚，带动躯干旋转。' },
+            { title: '五、随挥收拍', content: '击球后球拍继续向左肩方向随挥，结束时拍头指向天空或左肩后方。充分的随挥能增加击球力量和旋转。' }
+          ]
+        },
+        { id: 2, emoji: '🏃', title: '反手击球进阶指南', desc: '单手与双手反手的技术要领', memberOnly: false,
+          coverImg: IMG + '1541466050-72ba6b5b0dc5?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '一、双手反手握拍', img: IMG + '1551698618-1dfe5d97d256?w=700&h=320&fit=crop&q=80',
+              content: '右手采用大陆式握拍，左手在右手上方采用东方式正手握拍。双手协调发力，左手提供推力，右手控制方向。' },
+            { title: '二、转体引拍', content: '来球偏左时，迅速向左转体，双手将球拍引至右侧。引拍时保持肩膀充分转动，为发力储蓄动能。' },
+            { title: '三、击球发力', content: '击球时以腰部为轴向左旋转，双腿蹬地，将力量从下肢传递至躯干再到手臂。接触球的瞬间手腕收紧，稳定拍面。' },
+            { title: '四、常见错误', content: '①手臂过于主动用力，忽视腿部和躯干；②引拍不充分，击球时间仓促；③击球点太靠近身体，手肘顶人；④随挥不完整。' }
+          ]
+        },
+        { id: 3, emoji: '💪', title: '发球技术完全教程', desc: '平击、上旋、切削发球全解析', memberOnly: false,
+          coverImg: IMG + '1622279457486-62dcc4a431d6?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '一、平击发球', img: IMG + '1612872087775-a2f07e1e0a5c?w=700&h=320&fit=crop&q=80',
+              content: '以大陆式握拍，抛球在右肩前上方，拍面垂直击打球的后侧。发球时全身伸展，形成完整的抛物线动作。平击发球速度快，是第一发球的主要选择。' },
+            { title: '二、上旋发球', content: '抛球比平击发球略靠后，击打球的后上方，拍面从下向上刷过球体。上旋发球落地后弹跳快，对接发球员造成高弹点困扰。' },
+            { title: '三、节奏与稳定', content: '发球节奏要一致，从抛球到击球保持流畅不停顿。练习时从慢速开始，先建立正确动作，再逐渐增加速度。' }
+          ]
+        },
+        { id: 4, emoji: '🦶', title: '网球步法训练指南', desc: '快速移动与站位的核心技巧', memberOnly: false,
+          coverImg: IMG + '1560012057-4372e14c5085?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '一、基础步法', img: IMG + '1474274153-89b18f29a7ae?w=700&h=300&fit=crop&q=80',
+              content: '分步法：保持弓步移动，不允许双脚并拢，适合短距离快速移动。交叉步：适合大范围移动，前脚交叉迈出，速度快但稳定性略低。' },
+            { title: '二、恢复站位', content: '每次击球后立即恢复底线中央，这是接下来移动的最优出发点。恢复时采用小碎步，保持膝盖弯曲、重心前倾的准备状态。' },
+            { title: '三、步法训练方法', content: '①蜘蛛练习：在场地内设置多个目标点，计时跑位；②阶梯训练：提高脚步频率和灵活性；③影子练习：不用球，模拟移动击球。' }
+          ]
+        },
+        { id: 5, emoji: '🧘', title: '网球热身与拉伸', desc: '避免运动损伤的完整热身方案', memberOnly: false,
+          coverImg: IMG + '1571019613454-1cb2f99b2d8b?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '一、热身阶段（5-10分钟）', img: IMG + '1538805060975-3921ed219ca9?w=700&h=300&fit=crop&q=80',
+              content: '慢跑绕场2-3圈，激活心肺系统。关节活动：顺逆时针转动脚踝、膝盖、髋部、肩膀、手腕，每个关节各10次。' },
+            { title: '二、动态拉伸', content: '弓步前压：左右各10次，拉伸髋屈肌。腿部摆动：前后摆腿各10次，内外摆腿各10次。肩部旋转：手臂画大圈，正反各10次。' },
+            { title: '三、运动后拉伸', img: IMG + '1520877880798-5ee0a2571d9e?w=700&h=300&fit=crop&q=80',
+              content: '运动后进行静态拉伸，每个动作保持20-30秒。重点拉伸：小腿、大腿前后侧、肩膀和手腕。充分拉伸有助于肌肉恢复，减少酸痛。' }
+          ]
+        },
+        { id: 6, emoji: '🏆', title: '比赛战术与策略分析', desc: '从单打到双打的战术思维', memberOnly: false,
+          coverImg: IMG + '1546519638-68e109498ffc?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '一、发球战术', img: IMG + '1595435934249-5df7ed86e1c0?w=700&h=300&fit=crop&q=80',
+              content: '发球是比赛的主动开局，善用大角度外角球和身体球交替，让对手难以预判。第一发球力求速度与落点，第二发球注重旋转与稳定，将对手推至被动位置。' },
+            { title: '二、底线对抗策略', content: '建立稳定的斜线对打，伺机用直线突破。当对手回球质量下降时，果断变线或上前压制。保持对球的深度控制，不轻易打出短球送分。' },
+            { title: '三、上网时机选择', content: '进攻型短球、对手回球较浅、或自己主动放小球后，是最佳上网时机。上网路线要压住中路，减少对手穿越角度，同时准备好应对挑高球。' },
+            { title: '四、双打站位配合', content: '双打中后场球员发球/底线击球时，前场球员站在服务线附近，随时准备截击。双方移动应保持平行，一人上网则另一人跟进，避免空当被穿越。' }
+          ]
+        },
+        { id: 7, emoji: '🎯', title: '网前截击与高压球', desc: '上网进攻的技术要领', memberOnly: false,
+          coverImg: IMG + '1489619243109-4e0ea59cfe10?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '一、截击基础', img: IMG + '1504216069936-6a2d7a3af8a2?w=700&h=300&fit=crop&q=80',
+              content: '截击时采用大陆式握拍，无需后摆，以短促有力的推击动作为主。拍面略朝上，接触点在身体前方，利用来球的速度反弹，减少主动发力。' },
+            { title: '二、正反手截击', content: '正手截击：拍头高于手腕，向前推击球的外侧，打出斜线或直线。反手截击：手腕保持稳定，拍面角度控制落点，适合压制对手底线。' },
+            { title: '三、高压球技术', content: '当对手挑高球时，迅速后退并侧身，用非持拍手指向来球方向辅助判断。以发球动作击打高压球，充分伸展身体，拍头从上向前下方加速挥过球体。' },
+            { title: '四、上网心理建设', content: '上网后保持积极主动的心态，不因失误而退缩。多次练习可建立上网信心。即便被穿越，也要分析原因，调整下次上网的时机与站位。' }
+          ]
+        },
+        { id: 8, emoji: '🏃', title: '网球体能训练计划', desc: '专项体能提升8周方案', memberOnly: false,
+          coverImg: IMG + '1518611012118-696072aa579a?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '第1-2周：基础有氧', img: IMG + '1461896836374-0f22516aa6a6?w=700&h=300&fit=crop&q=80',
+              content: '每次训练30-40分钟，包括：慢跑20分钟 + 绳梯步法练习10分钟 + 核心板支撑3组×30秒。目标：建立有氧基础，激活核心稳定性。' },
+            { title: '第3-4周：力量启动', content: '每次45分钟：深蹲3组×12次 + 弓步走3组×10次/侧 + 弹力带侧步3组×15次 + 俯卧撑3组×15次。目标：强化腿部与上肢推力。' },
+            { title: '第5-6周：爆发力训练', img: IMG + '1534438327776-a9d64bc43ba6?w=700&h=300&fit=crop&q=80',
+              content: '每次50分钟：跳箱3组×8次 + 侧向跨步跳3组×10次/侧 + 药球旋转抛3组×12次。目标：提升起步速度和击球爆发力。' },
+            { title: '第7-8周：专项整合', content: '每次60分钟：综合步法训练（蜘蛛跑）+ 击球移位组合 + 全场模拟对打。目标：将体能优势转化为场上实战能力。' }
+          ]
+        },
+        { id: 9, emoji: '🎾', title: '上旋球技术精讲', desc: '增加击球旋转与稳定性', memberOnly: false,
+          coverImg: IMG + '1554068865-24cecd4e34b8?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '一、上旋球原理', img: IMG + '1475823678248-624fc6f85785?w=700&h=300&fit=crop&q=80',
+              content: '上旋球（Topspin）是拍面从下向上刷过球体，使球产生向前旋转。落地后弹跳快且高，迫使对手在高点处理球，增加其回球难度。' },
+            { title: '二、握拍与站位', content: '西方式或半西方式握拍更有利于制造上旋。击球时身体侧对来球，引拍低于击球点，从低到高加速挥拍，接触球的后上方。' },
+            { title: '三、练习方法', content: '①多球训练：喂球员连续喂球，专注挥拍路径从下往上；②靠墙练习：对着墙从低处拍向高处，感受拍面刷球的触感；③控制落点：有意识地打到指定区域，建立稳定性。' },
+            { title: '四、比赛应用', content: '大角度上旋：打出大幅度斜线，拉开对手位置。高弹上旋：朝对手反手深角打出高弹球，限制其进攻。上旋与平击结合：交替变化节奏，打乱对手判断。' }
+          ]
+        },
+        { id: 10, emoji: '✂️', title: '切削球与放小球', desc: '增加比赛变化的利器', memberOnly: false,
+          coverImg: IMG + '1560012057-4372e14c5085?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '一、切削球技术', img: IMG + '1571019613454-1cb2f99b2d8b?w=700&h=300&fit=crop&q=80',
+              content: '切削球（Slice）是拍面从上向下切过球的后侧，产生向后旋转（下旋）。球速较慢，落地后弹跳低，适合改变节奏、为自己争取时间或布置战术。' },
+            { title: '二、切削的击球动作', content: '大陆式握拍，拍头高于腕部，拍面略向后仰，从高处向下切削球体外侧。随挥方向向前下延伸，不要过早收拍。击球点略靠近身体。' },
+            { title: '三、放小球技术', content: '放小球（Drop Shot）需要极佳的手感与时机判断。用切削动作但力量极轻，球在网前短落地后几乎不弹起。最佳时机：对手站位靠后且来球较短时。' },
+            { title: '四、战术运用', content: '切削可用于：①回接发球，压低弹跳；②底线过渡，打破对手节奏；③接近网前前的过渡球。放小球则作为奇袭利器，与高压、底线深球组合使用，让对手疲于奔命。' }
+          ]
+        }
+    ];
+
+    function openTutorialPage() {
+        if (!isLoggedIn()) { openLoginModal(); return; }
+        openFeaturePage('page-tutorial');
+        renderTutorialList();
+    }
+
+    function renderTutorialList() {
+        const list = document.getElementById('tutorial-list');
+        list.innerHTML = '';
+        TUTORIALS.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'tutorial-card';
+            const badge = item.memberOnly
+                ? `<span class="tutorial-card-badge tutorial-badge-vip">${t('tutorialVip')}</span>`
+                : `<span class="tutorial-card-badge tutorial-badge-free">${t('tutorialFree')}</span>`;
+            card.innerHTML = `
+                <div class="tutorial-card-cover">${item.emoji}</div>
+                <div class="tutorial-card-body">
+                    ${badge}
+                    <div class="tutorial-card-title">${item.title}</div>
+                    <div class="tutorial-card-desc">${item.desc}</div>
+                </div>`;
+            card.addEventListener('click', () => openTutorialDetail(item));
+            list.appendChild(card);
+        });
+    }
+
+    function openTutorialDetail(item) {
+        const detail = document.getElementById('tutorial-detail');
+        document.getElementById('tutorial-detail-title').textContent = item.title;
+        const content = document.getElementById('tutorial-detail-content');
+        content.innerHTML = '';
+
+        // 封面大图
+        if (item.coverImg) {
+            content.innerHTML = `<div class="tutorial-cover-wrap"><img class="tutorial-cover-img" src="${item.coverImg}" alt="${item.title}" loading="lazy"></div>`;
+        }
+
+        if (item.memberOnly) {
+            content.innerHTML += `
+                <div class="tutorial-vip-lock">
+                    <div class="tutorial-vip-lock-icon">🔒</div>
+                    <div class="tutorial-vip-lock-text">${t('tutorialVipTitle')}</div>
+                    <div class="tutorial-vip-lock-sub">${t('tutorialVipSub')}</div>
+                    <div class="tutorial-vip-btn" onclick="closeFeaturePage('page-tutorial');openVipPage()">${t('tutorialVipBtn')}</div>
+                </div>`;
+        } else {
+            item.sections.forEach(sec => {
+                const el = document.createElement('div');
+                const imgHtml = sec.img
+                    ? `<img class="tutorial-section-img" src="${sec.img}" alt="${sec.title}" loading="lazy">`
+                    : '';
+                el.innerHTML = `
+                    <div class="tutorial-section-title">${sec.title}</div>
+                    ${imgHtml}
+                    <div class="tutorial-section-content">${sec.content}</div>`;
+                content.appendChild(el);
+            });
+        }
+        detail.classList.remove('hidden');
+    }
+
+    function closeTutorialDetail() {
+        document.getElementById('tutorial-detail').classList.add('hidden');
+    }
+
+    // ===================== 喝水打卡 =====================
+    const WATER_TARGET = 8;    // 杯
+    const WATER_PER_CUP = 250; // ml
+    const WATER_KEY = 'h5-water-data';
+    // 圆弧周长 2π×66≈414.69
+    const WATER_CIRCUMFERENCE = 2 * Math.PI * 66;
+
+    function getTodayKey() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function loadWaterData() {
+        try { return JSON.parse(localStorage.getItem(WATER_KEY) || '{}'); } catch(e) { return {}; }
+    }
+
+    function saveWaterData(data) {
+        localStorage.setItem(WATER_KEY, JSON.stringify(data));
+    }
+
+    function openWaterPage() {
+        if (!isLoggedIn()) { openLoginModal(); return; }
+        openFeaturePage('page-water');
+        renderWaterPage();
+    }
+
+    function renderWaterPage() {
+        const today = getTodayKey();
+        const d = new Date();
+        document.getElementById('water-date').textContent =
+            `${today}  ${['周日','周一','周二','周三','周四','周五','周六'][d.getDay()]}`;
+
+        const data = loadWaterData();
+        const todayData = data[today] || { cups: 0, records: [] };
+        updateWaterUI(todayData);
+    }
+
+    function updateWaterUI(todayData) {
+        const cups = todayData.cups || 0;
+        const ml   = cups * WATER_PER_CUP;
+        const pct  = Math.min(cups / WATER_TARGET, 1);
+        const offset = WATER_CIRCUMFERENCE * (1 - pct);
+
+        document.getElementById('water-cups-text').textContent = `${cups}/${WATER_TARGET} 杯`;
+        document.getElementById('water-ml-text').textContent   = `${ml} ml`;
+        document.getElementById('water-arc').style.strokeDashoffset = offset;
+
+        let mot = '加油补水💪';
+        if (cups >= WATER_TARGET) mot = '今日目标达成🎉';
+        else if (cups >= WATER_TARGET * 0.75) mot = '快完成了！';
+        else if (cups >= WATER_TARGET * 0.5) mot = '超过一半了';
+        document.getElementById('water-mot').textContent = mot;
+
+        // 记录列表
+        const records = document.getElementById('water-records');
+        const recs = (todayData.records || []).slice().reverse();
+        if (recs.length === 0) {
+            records.innerHTML = `<div class="water-empty">${t('waterNoRecord')}</div>`;
+        } else {
+            records.innerHTML = recs.map(r => `
+                <div class="water-record-item">
+                    <span class="water-record-time">${r.time}</span>
+                    <span class="water-record-amt">+${r.amount} ml</span>
+                </div>`).join('');
+        }
+    }
+
+    function bindWaterUI() {
+        document.getElementById('water-back-btn').addEventListener('click', () => closeFeaturePage('page-water'));
+        document.getElementById('water-plus-btn').addEventListener('click', () => {
+            const today = getTodayKey();
+            const data = loadWaterData();
+            if (!data[today]) data[today] = { cups: 0, records: [] };
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            data[today].cups++;
+            data[today].records.push({ time: timeStr, amount: WATER_PER_CUP });
+            saveWaterData(data);
+            updateWaterUI(data[today]);
+            showToast(t('waterAdded'));
+        });
+        document.getElementById('water-minus-btn').addEventListener('click', () => {
+            const today = getTodayKey();
+            const data = loadWaterData();
+            const td = data[today];
+            if (!td || td.cups <= 0) { showToast(t('waterNoMore')); return; }
+            td.cups--;
+            td.records.pop();
+            saveWaterData(data);
+            updateWaterUI(td);
+        });
+    }
+
+    // ===================== 训练计划 =====================
+    const PLAN_KEY = 'h5-training-plans';
+    let currentPlanTab = 'pending';
+
+    const PLAN_COLORS = ['#e8f5e9','#e3f2fd','#fff3e0','#fce4ec','#f3e5f5','#e0f7fa'];
+    const PLAN_ICON_COLORS = ['#43a047','#1e88e5','#fb8c00','#e53935','#8e24aa','#00acc1'];
+
+    const DEFAULT_PLANS = [
+        { id: 'p1', name: '基础挥拍训练', desc: '强化基础击球动作与节奏感', duration: 30, difficulty: 'easy',   bgIdx: 0, completed: false, createTime: Date.now() - 4*86400000 },
+        { id: 'p2', name: '体能强化训练', desc: '提升爆发力与耐力综合体能', duration: 45, difficulty: 'medium', bgIdx: 1, completed: false, createTime: Date.now() - 3*86400000 },
+        { id: 'p3', name: '步伐移动训练', desc: '快速移步与平衡恢复专项练习', duration: 40, difficulty: 'medium', bgIdx: 2, completed: true,  createTime: Date.now() - 2*86400000 },
+        { id: 'p4', name: '高强度对抗训练', desc: '模拟比赛情景的高强度练习', duration: 60, difficulty: 'hard',   bgIdx: 3, completed: false, createTime: Date.now() - 86400000  }
+    ];
+
+    function loadPlans() {
+        try {
+            const raw = localStorage.getItem(PLAN_KEY);
+            if (!raw) { savePlans(DEFAULT_PLANS); return DEFAULT_PLANS; }
+            return JSON.parse(raw);
+        } catch(e) { return DEFAULT_PLANS; }
+    }
+
+    function savePlans(plans) {
+        localStorage.setItem(PLAN_KEY, JSON.stringify(plans));
+    }
+
+    function openPlanPage() {
+        if (!isLoggedIn()) { openLoginModal(); return; }
+        openFeaturePage('page-plan');
+        renderPlanPage();
+    }
+
+    function renderPlanPage() {
+        const plans = loadPlans();
+        const pending = plans.filter(p => !p.completed);
+        const done    = plans.filter(p =>  p.completed);
+        document.getElementById('plan-total').textContent         = plans.length;
+        document.getElementById('plan-pending-count').textContent = pending.length;
+        document.getElementById('plan-done-count').textContent    = done.length;
+        renderPlanList(currentPlanTab === 'pending' ? pending : done);
+    }
+
+    function renderPlanList(plans) {
+        const list = document.getElementById('plan-list');
+        if (plans.length === 0) {
+            list.innerHTML = `<div class="plan-empty">${t('planEmpty')}</div>`;
+            return;
+        }
+        const diffLabel = { easy: t('diffEasy'), medium: t('diffMedium'), hard: t('diffHard') };
+        list.innerHTML = '';
+        plans.forEach(plan => {
+            const card = document.createElement('div');
+            card.className = 'plan-card';
+            const bg = PLAN_COLORS[plan.bgIdx % PLAN_COLORS.length];
+            const ic = PLAN_ICON_COLORS[plan.bgIdx % PLAN_ICON_COLORS.length];
+            const diff = plan.difficulty || 'easy';
+            const actionBtn = plan.completed
+                ? `<div class="plan-btn plan-btn-undo" onclick="togglePlan('${plan.id}',false)">${t('planUndo')}</div>`
+                : `<div class="plan-btn plan-btn-complete" onclick="togglePlan('${plan.id}',true)">${t('planComplete')}</div>`;
+            card.innerHTML = `
+                <div class="plan-card-header">
+                    <div class="plan-card-icon" style="background:${bg}">
+                        <span class="material-icons" style="color:${ic};font-size:22px">fitness_center</span>
+                    </div>
+                    <div class="plan-card-info">
+                        <div class="plan-card-name">${plan.name}</div>
+                        <div class="plan-card-desc">${plan.desc || ''}</div>
+                    </div>
+                </div>
+                <div class="plan-card-meta">
+                    <span class="plan-meta-tag">⏱ ${plan.duration} 分钟</span>
+                    <span class="plan-meta-tag plan-diff-${diff}">${diffLabel[diff]}</span>
+                </div>
+                <div class="plan-card-actions">
+                    ${actionBtn}
+                    <div class="plan-btn plan-btn-delete" onclick="deletePlan('${plan.id}')">${t('planDelete')}</div>
+                </div>`;
+            list.appendChild(card);
+        });
+    }
+
+    function switchPlanTab(tab) {
+        currentPlanTab = tab;
+        document.getElementById('plan-tab-pending').classList.toggle('active', tab === 'pending');
+        document.getElementById('plan-tab-done').classList.toggle('active', tab === 'done');
+        renderPlanPage();
+    }
+
+    function togglePlan(id, completed) {
+        const plans = loadPlans();
+        const plan = plans.find(p => p.id === id);
+        if (plan) { plan.completed = completed; savePlans(plans); }
+        renderPlanPage();
+        showToast(completed ? t('planCompleted') : t('planUndone'));
+    }
+
+    function deletePlan(id) {
+        const plans = loadPlans().filter(p => p.id !== id);
+        savePlans(plans);
+        renderPlanPage();
+        showToast(t('planDeleted'));
+    }
+
+    function openPlanModal() {
+        document.getElementById('plan-name-input').value = '';
+        document.getElementById('plan-desc-input').value = '';
+        document.getElementById('plan-dur-input').value  = '30';
+        document.getElementById('plan-diff-select').value = 'easy';
+        document.getElementById('plan-modal').classList.remove('hidden');
+    }
+
+    function closePlanModal() {
+        document.getElementById('plan-modal').classList.add('hidden');
+    }
+
+    function savePlan() {
+        const name = (document.getElementById('plan-name-input').value || '').trim();
+        if (!name) { showToast(t('planNameRequired')); return; }
+        const desc     = (document.getElementById('plan-desc-input').value || '').trim();
+        const duration = parseInt(document.getElementById('plan-dur-input').value) || 30;
+        const diff     = document.getElementById('plan-diff-select').value;
+        const plans    = loadPlans();
+        const bgIdx    = plans.length % PLAN_COLORS.length;
+        plans.unshift({ id: 'p' + Date.now(), name, desc, duration, difficulty: diff, bgIdx, completed: false, createTime: Date.now() });
+        savePlans(plans);
+        closePlanModal();
+        renderPlanPage();
+        showToast(t('planSaved'));
+    }
+
+    function bindPlanUI() {
+        document.getElementById('plan-back-btn').addEventListener('click', () => closeFeaturePage('page-plan'));
+        document.getElementById('plan-add-btn').addEventListener('click', openPlanModal);
+        document.getElementById('plan-modal').addEventListener('click', e => { if (e.target === document.getElementById('plan-modal')) closePlanModal(); });
+    }
+
+    function bindTutorialUI() {
+        document.getElementById('tutorial-back-btn').addEventListener('click', () => {
+            const detail = document.getElementById('tutorial-detail');
+            if (!detail.classList.contains('hidden')) { closeTutorialDetail(); return; }
+            closeFeaturePage('page-tutorial');
+        });
+        document.getElementById('tutorial-detail-back').addEventListener('click', closeTutorialDetail);
+    }
+
 });
+

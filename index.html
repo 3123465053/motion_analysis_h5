@@ -107,44 +107,33 @@
             </div>
         </div>
 
-        <!-- 更多运动 -->
-        <div class="more-sports-section">
+        <!-- 功能区 -->
+        <div class="func-section">
             <div class="section-header">
-                <span class="material-icons section-icon">sports</span>
-                <span class="section-title" data-i18n="sectionMoreSports">更多运动</span>
+                <span class="material-icons section-icon">grid_view</span>
+                <span class="section-title" data-i18n="sectionFeatures">运动工具</span>
             </div>
-            <div class="more-sports-grid">
-                <div class="more-sports-item" onclick="showToast(i18n.t('comingSoon'))">
-                    <div class="more-sports-icon" style="background:#e0f7fa">🏊</div>
-                    <span class="more-sports-label" data-i18n="sportSwim">游泳</span>
+            <div class="func-cards">
+                <div class="func-card" onclick="openTutorialPage()">
+                    <div class="func-card-icon" style="background:#e8f5e9">
+                        <span class="material-icons" style="color:#43a047;font-size:26px">menu_book</span>
+                    </div>
+                    <div class="func-card-label" data-i18n="funcTutorial">运动教程</div>
+                    <div class="func-card-sub" data-i18n="funcTutorialSub">科学锻炼指南</div>
                 </div>
-                <div class="more-sports-item" onclick="showToast(i18n.t('comingSoon'))">
-                    <div class="more-sports-icon" style="background:#fce4ec">🏏</div>
-                    <span class="more-sports-label" data-i18n="sportCricket">板球</span>
+                <div class="func-card" onclick="openWaterPage()">
+                    <div class="func-card-icon" style="background:#e3f2fd">
+                        <span class="material-icons" style="color:#1e88e5;font-size:26px">water_drop</span>
+                    </div>
+                    <div class="func-card-label" data-i18n="funcWater">喝水打卡</div>
+                    <div class="func-card-sub" data-i18n="funcWaterSub">每日健康补水</div>
                 </div>
-                <div class="more-sports-item" onclick="showToast(i18n.t('comingSoon'))">
-                    <div class="more-sports-icon" style="background:#e8f5e9">💪</div>
-                    <span class="more-sports-label" data-i18n="sportFitness">健身私教</span>
-                </div>
-                <div class="more-sports-item" onclick="showToast(i18n.t('comingSoon'))">
-                    <div class="more-sports-icon" style="background:#fff3e0">🏓</div>
-                    <span class="more-sports-label" data-i18n="sportPickleball">匹克球</span>
-                </div>
-                <div class="more-sports-item" onclick="showToast(i18n.t('comingSoon'))">
-                    <div class="more-sports-icon" style="background:#f3e5f5">🏓</div>
-                    <span class="more-sports-label" data-i18n="sportTableTennis">乒乓球</span>
-                </div>
-                <div class="more-sports-item" onclick="showToast(i18n.t('comingSoon'))">
-                    <div class="more-sports-icon" style="background:#e8eaf6">🏸</div>
-                    <span class="more-sports-label" data-i18n="sportBadminton">羽毛球</span>
-                </div>
-                <div class="more-sports-item" onclick="showToast(i18n.t('comingSoon'))">
-                    <div class="more-sports-icon" style="background:#fff8e1">🧘</div>
-                    <span class="more-sports-label" data-i18n="sportPilates">普拉提</span>
-                </div>
-                <div class="more-sports-item" onclick="showToast(i18n.t('comingSoon'))">
-                    <div class="more-sports-icon" style="background:#e0f2f1">⛳</div>
-                    <span class="more-sports-label" data-i18n="sportGolf">高尔夫</span>
+                <div class="func-card" onclick="openPlanPage()">
+                    <div class="func-card-icon" style="background:#fff3e0">
+                        <span class="material-icons" style="color:#fb8c00;font-size:26px">fitness_center</span>
+                    </div>
+                    <div class="func-card-label" data-i18n="funcPlan">训练计划</div>
+                    <div class="func-card-sub" data-i18n="funcPlanSub">制定个人训练</div>
                 </div>
             </div>
         </div>
@@ -200,23 +189,40 @@
 <div id="page-me" class="page hidden-tab">
     <div class="me-top-safe"></div>
     <div class="scroll-content me-scroll">
-        <div style="height:16px"></div>
+        <!-- 个人资料卡 -->
+        <div class="me-profile-card" id="me-profile-card" onclick="onProfileTap()">
+            <div class="me-profile-avatar" id="me-profile-avatar">
+                <span class="material-icons" id="me-profile-avatar-icon" style="font-size:30px;color:#fff">person</span>
+                <img id="me-profile-avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;">
+            </div>
+            <div class="me-profile-text">
+                <div class="me-profile-name" id="me-profile-name" data-i18n="tapToLogin">点击登录</div>
+                <div class="me-profile-sub" id="me-profile-sub" data-i18n="loginHint">登录后解锁更多功能</div>
+            </div>
+            <span class="material-icons me-profile-arrow">keyboard_arrow_right</span>
+        </div>
+
+        <!-- VIP 入口 -->
+        <div class="me-vip-card" onclick="openVipPage()">
+            <div class="me-vip-left">
+                <span class="material-icons me-vip-crown">workspace_premium</span>
+                <div>
+                    <div class="me-vip-title" data-i18n="vipTitle">开通 VIP 会员</div>
+                    <div class="me-vip-sub" data-i18n="vipSub">解锁全部高级功能</div>
+                </div>
+            </div>
+            <div class="me-vip-btn" data-i18n="vipOpenBtn">去开通</div>
+        </div>
+
         <div class="me-func-group">
-            <div class="me-func-item" onclick="window.open('https://sports.gzheyu.com.cn/pages/iSwingCoach/iSwingCoachPP','_blank')">
+            <div class="me-func-item" onclick="window.open('https://tennis.gzheyu.com.cn/pages/iSwingCoach/iSwingCoachText2','_blank')">
                 <div class="me-func-icon" style="background:#e8f5e9">
                     <span class="material-icons" style="font-size:20px;color:#4caf50">lock</span>
                 </div>
                 <span class="me-func-title" data-i18n="privacyPolicy">隐私政策</span>
                 <span class="material-icons me-func-arrow">keyboard_arrow_right</span>
             </div>
-            <div class="me-func-item" onclick="window.open('https://sports.gzheyu.com.cn/pages/iSwingCoach/iSwingCoachSCL','_blank')">
-                <div class="me-func-icon" style="background:#e3f2fd">
-                    <span class="material-icons" style="font-size:20px;color:#2196f3">gavel</span>
-                </div>
-                <span class="me-func-title" data-i18n="specialLaw">特商法</span>
-                <span class="material-icons me-func-arrow">keyboard_arrow_right</span>
-            </div>
-            <div class="me-func-item" onclick="window.open('https://sports.gzheyu.com.cn/pages/iSwingCoach/iSwingCoachUA','_blank')">
+            <div class="me-func-item" onclick="window.open('https://tennis.gzheyu.com.cn/pages/iSwingCoach/iSwingCoachText1','_blank')">
                 <div class="me-func-icon" style="background:#fff3e0">
                     <span class="material-icons" style="font-size:20px;color:#ff9800">description</span>
                 </div>
@@ -310,6 +316,275 @@
             <div style="font-size:15px;color:#f44336;margin-bottom:4px" data-i18n="generateFailed">生成失败</div>
             <div style="font-size:13px;color:#aaa;margin-bottom:16px" id="faceswap-error-msg" data-i18n="checkNetwork">请检查网络后重试</div>
             <div class="faceswap-submit-btn" id="faceswap-retry-btn" data-i18n="retryGenerate">重新尝试</div>
+        </div>
+    </div>
+</div>
+
+<!-- PAGE: VIP 会员 -->
+<div id="page-vip" class="page hidden">
+    <div class="app-bar vip-app-bar">
+        <div class="app-bar-left">
+            <span class="material-icons back-btn" id="vip-back-btn">arrow_back_ios</span>
+        </div>
+        <div class="app-bar-title" data-i18n="vipPageTitle">VIP 会员</div>
+        <div class="app-bar-right"></div>
+    </div>
+    <div class="scroll-content" style="padding-bottom:40px">
+        <!-- 顶部英雄区 -->
+        <div class="vip-hero">
+            <span class="material-icons vip-hero-crown">workspace_premium</span>
+            <div class="vip-hero-title" data-i18n="vipHeroTitle">iSwingCoach 连续会员</div>
+            <div class="vip-hero-sub" data-i18n="vipHeroSub">高级 AI 教练 · 无限换脸 · 专属模板</div>
+        </div>
+
+        <!-- 特权列表 -->
+        <div class="vip-benefits">
+            <div class="vip-benefit-item">
+                <span class="material-icons vip-benefit-icon" style="color:#ffb300">auto_awesome</span>
+                <span class="vip-benefit-text" data-i18n="vipBenefit1">无限次 AI 挥拍分析</span>
+            </div>
+            <div class="vip-benefit-item">
+                <span class="material-icons vip-benefit-icon" style="color:#ff6b6b">face_retouching_natural</span>
+                <span class="vip-benefit-text" data-i18n="vipBenefit2">无限次 AI 视频换脸</span>
+            </div>
+            <div class="vip-benefit-item">
+                <span class="material-icons vip-benefit-icon" style="color:#4caf50">rocket_launch</span>
+                <span class="vip-benefit-text" data-i18n="vipBenefit3">专属高速合成通道</span>
+            </div>
+            <div class="vip-benefit-item">
+                <span class="material-icons vip-benefit-icon" style="color:#2196f3">workspace_premium</span>
+                <span class="vip-benefit-text" data-i18n="vipBenefit4">会员专属模板与场景</span>
+            </div>
+        </div>
+
+        <!-- 套餐 -->
+        <div class="vip-plan-title" data-i18n="vipPickPlan">订阅套餐</div>
+        <div class="vip-plans">
+            <div class="vip-plan-card vip-plan-highlight" id="vip-card-sub" onclick="onVipPlanTap('sub')">
+                <div class="vip-plan-badge vip-plan-badge-save" data-i18n="vipBadgeRecommend">推荐</div>
+                <div class="vip-plan-single-row">
+                    <div class="vip-plan-single-left">
+                        <div class="vip-plan-name" data-i18n="vipPlanMonth">连续包月</div>
+                        <div class="vip-plan-desc" data-i18n="vipPlanMonthDesc">首月优惠，次月自动续费，可随时取消</div>
+                    </div>
+                    <div class="vip-plan-price">
+                        <span class="vip-plan-currency">¥</span><span class="vip-plan-amount">18</span><span class="vip-plan-unit" data-i18n="vipPerMonth">/月</span>
+                    </div>
+                </div>
+            </div>
+            <div class="vip-plan-card" id="vip-card-once" onclick="onVipPlanTap('once')">
+                <div class="vip-plan-single-row">
+                    <div class="vip-plan-single-left">
+                        <div class="vip-plan-name" data-i18n="vipPlanOnce">单次包月</div>
+                        <div class="vip-plan-desc" data-i18n="vipPlanOnceDesc">买一个月，到期不续费</div>
+                    </div>
+                    <div class="vip-plan-price">
+                        <span class="vip-plan-currency">¥</span><span class="vip-plan-amount">25</span><span class="vip-plan-unit" data-i18n="vipPerMonth">/月</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 微信支付按钮 -->
+        <div class="vip-pay-wrap">
+            <div class="vip-pay-btn" onclick="onVipPayTap()">
+                <span class="vip-pay-wx-icon">
+                    <svg viewBox="0 0 1024 1024" width="22" height="22"><path fill="#fff" d="M664.25 379.875c8.719 0 17.125.625 25.625 1.594-23-107.094-137.5-186.688-268.125-186.688-146.125 0-265.781 99.719-265.781 226.375 0 73.125 39.844 133.219 106.219 179.719l-26.563 79.781 92.906-46.531c33.219 6.531 59.938 13.313 93.219 13.313 8.438 0 16.719-.375 25-1-5.25-17.875-8.313-36.625-8.313-56 0.001-116.844 100.407-211.563 225.813-211.563zm-142.594-71.813c19.938 0 33.25 13.125 33.25 33 0 19.813-13.313 33.125-33.25 33.125-19.938 0-39.906-13.313-39.906-33.125 0-19.875 19.969-33 39.906-33zm-186.125 66.125c-19.969 0-40.063-13.313-40.063-33.125 0-19.875 20.094-33 40.063-33 19.875 0 33.219 13.125 33.219 33 0 19.813-13.344 33.125-33.219 33.125zm532.844 200.406c0-106.5-106.063-193.313-224.469-193.313-125.406 0-224.531 86.813-224.531 193.313 0 106.594 99.125 193.344 224.531 193.344 26.25 0 52.688-6.719 79-13.281l72.281 39.719-19.813-66.125c53-39.938 93-93.375 93-153.656zm-297.5-33.125c-13.281 0-26.625-13.125-26.625-26.563 0-13.281 13.344-26.563 26.625-26.563 20.063 0 33.281 13.281 33.281 26.563 0 13.438-13.219 26.563-33.281 26.563zm146.031 0c-13.188 0-26.469-13.125-26.469-26.563 0-13.281 13.281-26.563 26.469-26.563 19.938 0 33.281 13.281 33.281 26.563 0 13.438-13.344 26.563-33.281 26.563z"/></svg>
+                </span>
+                <span class="vip-pay-text" data-i18n="vipPayWeChat">微信支付 开通会员</span>
+            </div>
+            <div class="vip-pay-agree" data-i18n="vipPayAgree">点击开通即视为同意《会员服务协议》，可随时取消订阅</div>
+        </div>
+
+        <!-- 购买须知 -->
+        <div class="vip-notice">
+            <div class="vip-notice-title">购买须知</div>
+            <div class="vip-notice-item">1. 会员服务开通后即时生效，有效期内享受全部会员权益，解锁所有付费功能。</div>
+            <div class="vip-notice-item">2. 订阅连续包月会在到期前24小时内自动续费，可随时在微信支付退订入口取消。
+                <div class="vip-notice-sub">步骤：进入「我」→「服务」→「钱包」→「支付设置」→「自动续费」（或"扣费服务"）→ 项目列表 → 滑到底部点击「关闭扣费服务」或「关闭服务」</div>
+            </div>
+            <div class="vip-notice-item">3. 售后方式：发送邮件至 <a href="mailto:help@douring.com" class="vip-notice-link">help@douring.com</a> 联系我们。</div>
+            <div class="vip-notice-item">4. 客服热线：<a href="tel:4008823019" class="vip-notice-link">4008823019</a>，工作时间：周一至周五 9:00–18:00</div>
+        </div>
+    </div>
+</div>
+
+<!-- PAGE: 运动教程 -->
+<div id="page-tutorial" class="page hidden">
+    <div class="app-bar">
+        <div class="app-bar-left">
+            <span class="material-icons back-btn" id="tutorial-back-btn">arrow_back_ios</span>
+        </div>
+        <div class="app-bar-title" data-i18n="funcTutorial">运动教程</div>
+        <div class="app-bar-right"></div>
+    </div>
+    <div class="scroll-content" id="tutorial-list-wrap" style="padding-bottom:24px">
+        <div class="tutorial-list" id="tutorial-list"></div>
+    </div>
+    <!-- 文章详情 -->
+    <div id="tutorial-detail" class="tutorial-detail hidden">
+        <div class="app-bar">
+            <div class="app-bar-left">
+                <span class="material-icons back-btn" id="tutorial-detail-back">arrow_back_ios</span>
+            </div>
+            <div class="app-bar-title" id="tutorial-detail-title"></div>
+            <div class="app-bar-right"></div>
+        </div>
+        <div class="scroll-content" style="padding-bottom:24px">
+            <div id="tutorial-detail-content" class="tutorial-detail-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- PAGE: 喝水打卡 -->
+<div id="page-water" class="page hidden">
+    <div class="app-bar">
+        <div class="app-bar-left">
+            <span class="material-icons back-btn" id="water-back-btn">arrow_back_ios</span>
+        </div>
+        <div class="app-bar-title" data-i18n="funcWater">喝水打卡</div>
+        <div class="app-bar-right"></div>
+    </div>
+    <div class="scroll-content" style="padding-bottom:30px">
+        <!-- 日期 -->
+        <div class="water-date" id="water-date"></div>
+        <!-- 圆形进度 -->
+        <div class="water-circle-wrap">
+            <svg class="water-svg" viewBox="0 0 160 160">
+                <circle class="water-track" cx="80" cy="80" r="66"/>
+                <circle class="water-fill" id="water-arc" cx="80" cy="80" r="66"/>
+            </svg>
+            <div class="water-circle-inner">
+                <div class="water-cups-text" id="water-cups-text">0/8 杯</div>
+                <div class="water-ml-text" id="water-ml-text">0 ml</div>
+                <div class="water-mot" id="water-mot">加油补水💪</div>
+            </div>
+        </div>
+        <!-- 操作 -->
+        <div class="water-actions">
+            <div class="water-btn water-btn-minus" id="water-minus-btn">−</div>
+            <div class="water-btn water-btn-plus" id="water-plus-btn">
+                <span class="material-icons" style="font-size:18px;margin-right:4px">water_drop</span>
+                <span data-i18n="waterDrink">喝水 +250ml</span>
+            </div>
+        </div>
+        <!-- 今日记录 -->
+        <div class="water-record-title" data-i18n="waterRecord">今日记录</div>
+        <div id="water-records" class="water-records"></div>
+        <!-- 补水贴士 -->
+        <div class="water-tips-box">
+            <div class="water-tips-title" data-i18n="waterTipsTitle">运动补水小贴士</div>
+            <div class="water-tip-item" data-i18n="waterTip1">💧 运动前30分钟，提前喝200ml水</div>
+            <div class="water-tip-item" data-i18n="waterTip2">💧 运动中每15~20分钟补水150ml</div>
+            <div class="water-tip-item" data-i18n="waterTip3">💧 运动后少量多次补水，避免暴饮</div>
+            <div class="water-tip-item" data-i18n="waterTip4">💧 炎热天气或大量出汗时适当增量</div>
+            <div class="water-tip-item" data-i18n="waterTip5">💧 建议每日总饮水量不少于2000ml</div>
+        </div>
+    </div>
+</div>
+
+<!-- PAGE: 训练计划 -->
+<div id="page-plan" class="page hidden">
+    <div class="app-bar">
+        <div class="app-bar-left">
+            <span class="material-icons back-btn" id="plan-back-btn">arrow_back_ios</span>
+        </div>
+        <div class="app-bar-title" data-i18n="funcPlan">训练计划</div>
+        <div class="app-bar-right">
+            <div class="plan-add-btn" id="plan-add-btn" data-i18n="planNew">+ 新建</div>
+        </div>
+    </div>
+    <div class="scroll-content" style="padding-bottom:30px">
+        <!-- 今日摘要 -->
+        <div class="plan-summary">
+            <div class="plan-summary-item">
+                <div class="plan-summary-num" id="plan-total">0</div>
+                <div class="plan-summary-label" data-i18n="planAll">全部</div>
+            </div>
+            <div class="plan-summary-sep"></div>
+            <div class="plan-summary-item">
+                <div class="plan-summary-num" id="plan-pending-count">0</div>
+                <div class="plan-summary-label" data-i18n="planPending">待完成</div>
+            </div>
+            <div class="plan-summary-sep"></div>
+            <div class="plan-summary-item">
+                <div class="plan-summary-num" id="plan-done-count">0</div>
+                <div class="plan-summary-label" data-i18n="planDone">已完成</div>
+            </div>
+        </div>
+        <!-- Tab -->
+        <div class="plan-tabs">
+            <div class="plan-tab active" id="plan-tab-pending" onclick="switchPlanTab('pending')" data-i18n="planPending">待完成</div>
+            <div class="plan-tab" id="plan-tab-done" onclick="switchPlanTab('done')" data-i18n="planDone">已完成</div>
+        </div>
+        <!-- 计划列表 -->
+        <div id="plan-list" class="plan-list"></div>
+    </div>
+    <!-- 新建弹窗 -->
+    <div class="plan-modal hidden" id="plan-modal">
+        <div class="plan-modal-card">
+            <div class="plan-modal-title" data-i18n="planNewTitle">新建训练计划</div>
+            <input class="plan-modal-input" id="plan-name-input" data-i18n-placeholder="planNamePlh" placeholder="计划名称（必填）">
+            <textarea class="plan-modal-textarea" id="plan-desc-input" data-i18n-placeholder="planDescPlh" placeholder="计划描述（可选）"></textarea>
+            <div class="plan-modal-row">
+                <span class="plan-modal-label" data-i18n="planDuration">时长（分钟）</span>
+                <input class="plan-modal-input-sm" id="plan-dur-input" type="number" value="30" min="5">
+            </div>
+            <div class="plan-modal-row">
+                <span class="plan-modal-label" data-i18n="planDifficulty">难度</span>
+                <select class="plan-modal-select" id="plan-diff-select">
+                    <option value="easy" data-i18n="diffEasy">初级</option>
+                    <option value="medium" data-i18n="diffMedium">中级</option>
+                    <option value="hard" data-i18n="diffHard">高级</option>
+                </select>
+            </div>
+            <div class="plan-modal-btns">
+                <div class="plan-modal-btn plan-modal-cancel" onclick="closePlanModal()" data-i18n="cancel">取消</div>
+                <div class="plan-modal-btn plan-modal-ok" onclick="savePlan()" data-i18n="save">保存</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 登录弹窗 -->
+<div id="login-mask" class="login-mask hidden">
+    <div class="login-card">
+        <span class="material-icons login-close" id="login-close-btn">close</span>
+        <div class="login-logo"><img src="assets/images/app_icon.jpg" alt=""></div>
+        <div class="login-title" data-i18n="loginTitle">邮箱登录</div>
+        <div class="login-sub" data-i18n="loginSubTitle">登录后可解锁完整功能</div>
+
+        <div class="login-input-wrap">
+            <span class="material-icons login-input-icon">mail_outline</span>
+            <input id="login-email" type="email" class="login-input" autocomplete="email" data-i18n-placeholder="loginEmailPlaceholder" placeholder="请输入邮箱">
+        </div>
+        <div class="login-input-wrap">
+            <span class="material-icons login-input-icon">pin</span>
+            <input id="login-code" type="text" inputmode="numeric" maxlength="6" class="login-input" data-i18n-placeholder="loginCodePlaceholder" placeholder="请输入验证码">
+            <div class="login-send-code" id="login-send-code-btn" data-i18n="sendCode">发送验证码</div>
+        </div>
+
+        <div class="login-error hidden" id="login-error"></div>
+
+        <div class="login-submit" id="login-submit-btn" data-i18n="loginBtn">登录</div>
+
+        <div class="login-agree">
+            <span data-i18n="loginAgreeTip">登录即代表同意</span>
+            <a onclick="event.stopPropagation();window.open('https://tennis.gzheyu.com.cn/pages/iSwingCoach/iSwingCoachText1','_blank')" data-i18n="userAgreement">用户协议</a>
+            <span data-i18n="loginAgreeAnd">和</span>
+            <a onclick="event.stopPropagation();window.open('https://tennis.gzheyu.com.cn/pages/iSwingCoach/iSwingCoachText2','_blank')" data-i18n="privacyPolicy">隐私政策</a>
+        </div>
+    </div>
+</div>
+
+<!-- 登出确认 -->
+<div id="logout-mask" class="login-mask hidden">
+    <div class="login-card logout-card">
+        <div class="logout-title" data-i18n="logoutConfirmTitle">确认退出登录？</div>
+        <div class="logout-sub" data-i18n="logoutConfirmSub">退出后部分功能将不可用</div>
+        <div class="logout-actions">
+            <div class="logout-btn logout-btn-cancel" id="logout-cancel-btn" data-i18n="cancel">取消</div>
+            <div class="logout-btn logout-btn-ok" id="logout-ok-btn" data-i18n="logout">退出登录</div>
         </div>
     </div>
 </div>
