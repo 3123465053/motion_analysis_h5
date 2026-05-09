@@ -131,9 +131,11 @@ document.addEventListener('DOMContentLoaded', () => {
     window.switchPlanTab     = switchPlanTab;
     window.togglePlan        = togglePlan;
     window.deletePlan        = deletePlan;
-    window.closePlanModal    = closePlanModal;
-    window.savePlan          = savePlan;
-    window.closeFeaturePage  = closeFeaturePage;
+    window.closePlanModal       = closePlanModal;
+    window.savePlan             = savePlan;
+    window.closeFeaturePage     = closeFeaturePage;
+    window.closeVipSuccessModal = closeVipSuccessModal;
+    window.onVipCancelTap       = onVipCancelTap;
 
     // ===== BANNER CONTROLS =====
     let bannerPlayOverlayTimer = null;
@@ -230,6 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     function onShootTap() {
         if (!isLoggedIn()) { openLoginModal(); return; }
+        if (!isVipMember()) { showToast(t('vipRequired')); openVipPage(); return; }
         videoInput.click();
     }
 
@@ -247,6 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 '<div class="card-badge" style="background:' + scene.color + '">' + scene.desc + '</div>';
             card.addEventListener('click', () => {
                 if (!isLoggedIn()) { openLoginModal(); return; }
+                if (!isVipMember()) { showToast(t('vipRequired')); openVipPage(); return; }
                 videoInput.click();
             });
             sceneGrid.appendChild(card);
@@ -896,9 +900,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // ===================== VIP 状态（本地） =====================
+    const VIP_KEY = 'h5-vip-type'; // 'sub' | 'once' | null
+
+    function isVipMember() { return !!localStorage.getItem(VIP_KEY); }
+    function getVipType()   { return localStorage.getItem(VIP_KEY); }
+    function activateVip(type) { localStorage.setItem(VIP_KEY, type); }
+    function deactivateVip()   { localStorage.removeItem(VIP_KEY); }
+
     // ===================== VIP PAGE =====================
     function openVipPage() {
         const page = document.getElementById('page-vip');
+        refreshVipPageUI();
         page.classList.remove('hidden');
         setTimeout(() => page.classList.add('active'), 10);
         bottomNav.style.display = 'none';
@@ -911,6 +924,21 @@ document.addEventListener('DOMContentLoaded', () => {
         bottomNav.style.display = 'flex';
     }
 
+    function refreshVipPageUI() {
+        const statusEl = document.getElementById('vip-status-bar');
+        if (!statusEl) return;
+        const type = getVipType();
+        if (type === 'sub') {
+            statusEl.textContent = '✅ ' + t('vipStatusSub');
+            statusEl.classList.remove('hidden');
+        } else if (type === 'once') {
+            statusEl.textContent = '✅ ' + t('vipStatusOnce');
+            statusEl.classList.remove('hidden');
+        } else {
+            statusEl.classList.add('hidden');
+        }
+    }
+
     // VIP 套餐选中状态
     let selectedVipPlan = 'sub'; // 'sub' | 'once'
     function onVipPlanTap(plan) {
@@ -920,7 +948,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function onVipPayTap() {
-        showToast(t('featureInDev'));
+        activateVip(selectedVipPlan);
+        refreshVipPageUI();
+        document.getElementById('vip-success-modal').classList.remove('hidden');
+    }
+
+    function closeVipSuccessModal() {
+        document.getElementById('vip-success-modal').classList.add('hidden');
+    }
+
+    function onVipCancelTap() {
+        if (getVipType() === 'sub') {
+            deactivateVip();
+            refreshVipPageUI();
+            showToast(t('vipCancelled'));
+        } else {
+            showToast(t('vipNotSub'));
+        }
     }
 
     // ===================== 通用页面切换工具 =====================
@@ -952,7 +996,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { title: '五、随挥收拍', content: '击球后球拍继续向左肩方向随挥，结束时拍头指向天空或左肩后方。充分的随挥能增加击球力量和旋转。' }
           ]
         },
-        { id: 2, emoji: '🏃', title: '反手击球进阶指南', desc: '单手与双手反手的技术要领', memberOnly: false,
+        { id: 2, emoji: '🏃', title: '反手击球进阶指南', desc: '单手与双手反手的技术要领', memberOnly: true,
           coverImg: IMG + '1541466050-72ba6b5b0dc5?w=800&h=360&fit=crop&q=80',
           sections: [
             { title: '一、双手反手握拍', img: IMG + '1551698618-1dfe5d97d256?w=700&h=320&fit=crop&q=80',
@@ -962,7 +1006,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { title: '四、常见错误', content: '①手臂过于主动用力，忽视腿部和躯干；②引拍不充分，击球时间仓促；③击球点太靠近身体，手肘顶人；④随挥不完整。' }
           ]
         },
-        { id: 3, emoji: '💪', title: '发球技术完全教程', desc: '平击、上旋、切削发球全解析', memberOnly: false,
+        { id: 3, emoji: '💪', title: '发球技术完全教程', desc: '平击、上旋、切削发球全解析', memberOnly: true,
           coverImg: IMG + '1622279457486-62dcc4a431d6?w=800&h=360&fit=crop&q=80',
           sections: [
             { title: '一、平击发球', img: IMG + '1612872087775-a2f07e1e0a5c?w=700&h=320&fit=crop&q=80',
@@ -990,7 +1034,7 @@ document.addEventListener('DOMContentLoaded', () => {
               content: '运动后进行静态拉伸，每个动作保持20-30秒。重点拉伸：小腿、大腿前后侧、肩膀和手腕。充分拉伸有助于肌肉恢复，减少酸痛。' }
           ]
         },
-        { id: 6, emoji: '🏆', title: '比赛战术与策略分析', desc: '从单打到双打的战术思维', memberOnly: false,
+        { id: 6, emoji: '🏆', title: '比赛战术与策略分析', desc: '从单打到双打的战术思维', memberOnly: true,
           coverImg: IMG + '1546519638-68e109498ffc?w=800&h=360&fit=crop&q=80',
           sections: [
             { title: '一、发球战术', img: IMG + '1595435934249-5df7ed86e1c0?w=700&h=300&fit=crop&q=80',
@@ -1000,7 +1044,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { title: '四、双打站位配合', content: '双打中后场球员发球/底线击球时，前场球员站在服务线附近，随时准备截击。双方移动应保持平行，一人上网则另一人跟进，避免空当被穿越。' }
           ]
         },
-        { id: 7, emoji: '🎯', title: '网前截击与高压球', desc: '上网进攻的技术要领', memberOnly: false,
+        { id: 7, emoji: '🎯', title: '网前截击与高压球', desc: '上网进攻的技术要领', memberOnly: true,
           coverImg: IMG + '1489619243109-4e0ea59cfe10?w=800&h=360&fit=crop&q=80',
           sections: [
             { title: '一、截击基础', img: IMG + '1504216069936-6a2d7a3af8a2?w=700&h=300&fit=crop&q=80',
@@ -1010,7 +1054,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { title: '四、上网心理建设', content: '上网后保持积极主动的心态，不因失误而退缩。多次练习可建立上网信心。即便被穿越，也要分析原因，调整下次上网的时机与站位。' }
           ]
         },
-        { id: 8, emoji: '🏃', title: '网球体能训练计划', desc: '专项体能提升8周方案', memberOnly: false,
+        { id: 8, emoji: '🏃', title: '网球体能训练计划', desc: '专项体能提升8周方案', memberOnly: true,
           coverImg: IMG + '1518611012118-696072aa579a?w=800&h=360&fit=crop&q=80',
           sections: [
             { title: '第1-2周：基础有氧', img: IMG + '1461896836374-0f22516aa6a6?w=700&h=300&fit=crop&q=80',
@@ -1021,7 +1065,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { title: '第7-8周：专项整合', content: '每次60分钟：综合步法训练（蜘蛛跑）+ 击球移位组合 + 全场模拟对打。目标：将体能优势转化为场上实战能力。' }
           ]
         },
-        { id: 9, emoji: '🎾', title: '上旋球技术精讲', desc: '增加击球旋转与稳定性', memberOnly: false,
+        { id: 9, emoji: '🎾', title: '上旋球技术精讲', desc: '增加击球旋转与稳定性', memberOnly: true,
           coverImg: IMG + '1554068865-24cecd4e34b8?w=800&h=360&fit=crop&q=80',
           sections: [
             { title: '一、上旋球原理', img: IMG + '1475823678248-624fc6f85785?w=700&h=300&fit=crop&q=80',
@@ -1031,7 +1075,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { title: '四、比赛应用', content: '大角度上旋：打出大幅度斜线，拉开对手位置。高弹上旋：朝对手反手深角打出高弹球，限制其进攻。上旋与平击结合：交替变化节奏，打乱对手判断。' }
           ]
         },
-        { id: 10, emoji: '✂️', title: '切削球与放小球', desc: '增加比赛变化的利器', memberOnly: false,
+        { id: 10, emoji: '✂️', title: '切削球与放小球', desc: '增加比赛变化的利器', memberOnly: true,
           coverImg: IMG + '1560012057-4372e14c5085?w=800&h=360&fit=crop&q=80',
           sections: [
             { title: '一、切削球技术', img: IMG + '1571019613454-1cb2f99b2d8b?w=700&h=300&fit=crop&q=80',
@@ -1039,6 +1083,101 @@ document.addEventListener('DOMContentLoaded', () => {
             { title: '二、切削的击球动作', content: '大陆式握拍，拍头高于腕部，拍面略向后仰，从高处向下切削球体外侧。随挥方向向前下延伸，不要过早收拍。击球点略靠近身体。' },
             { title: '三、放小球技术', content: '放小球（Drop Shot）需要极佳的手感与时机判断。用切削动作但力量极轻，球在网前短落地后几乎不弹起。最佳时机：对手站位靠后且来球较短时。' },
             { title: '四、战术运用', content: '切削可用于：①回接发球，压低弹跳；②底线过渡，打破对手节奏；③接近网前前的过渡球。放小球则作为奇袭利器，与高压、底线深球组合使用，让对手疲于奔命。' }
+          ]
+        },
+        { id: 11, emoji: '🤝', title: '双打技术与站位配合', desc: '双打制胜的默契与分工策略', memberOnly: true,
+          coverImg: IMG + '1546519638-68e109498ffc?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '一、双打基本站位', img: IMG + '1595435934249-5df7ed86e1c0?w=700&h=300&fit=crop&q=80',
+              content: '发球方：发球者在底线，搭档在网前截击位（服务线附近）。接发球方：接球者在底线，搭档在对侧服务线附近。随击球方向平行移动，始终保持两人在同一横线上。' },
+            { title: '二、发球上网战术', content: '发球后跟随上网，与前场搭档形成双网压制阵型。双网时要封住中路，减少对手穿越机会。搭档需随时准备处理对手的挑高球反击。' },
+            { title: '三、破网战术', content: '对手双网时，可采用：①直线穿越球；②挑高弧线球迫使后退；③中路捅球利用两人之间空档。判断对手的弱侧，集中攻击。' },
+            { title: '四、沟通与信号', content: '双打中的沟通至关重要。使用手势信号告知搭档发球方向（手背向外=外角，拳头=身体球）。每分结束后相互鼓励，保持节奏一致。' }
+          ]
+        },
+        { id: 12, emoji: '📐', title: '接发球技术精讲', desc: '稳定接发球是比赛的关键', memberOnly: true,
+          coverImg: IMG + '1587280501635-68a0e82cd5ff?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '一、准备姿势与站位', content: '接发球时站在底线附近，根据对手发球速度和落点调整站位。准备姿势要低重心、双腿开合，便于快速向任意方向移动。' },
+            { title: '二、判断来球', img: IMG + '1554068865-24cecd4e34b8?w=700&h=300&fit=crop&q=80',
+              content: '观察对手抛球位置判断发球类型：抛球靠前→平击；抛球靠后偏左→上旋；抛球偏右→切削。提前预判可赢得宝贵的反应时间。' },
+            { title: '三、接第一发球', content: '第一发球速度快，以挡球为主，不强求主动进攻。目标是将球回到对角深区，给自己争取时间恢复站位，避免冒险进攻送分。' },
+            { title: '四、接第二发球', content: '第二发球是进攻机会，可适当前压站位，主动接击。针对上旋发球高弹点，侧身用正手大力压制。切削发球要注意低弹点，蹲低身体挑起击球。' }
+          ]
+        },
+        { id: 13, emoji: '🧠', title: '网球心理与竞技状态', desc: '心态决定比赛的胜负走向', memberOnly: true,
+          coverImg: IMG + '1541466050-72ba6b5b0dc5?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '一、赛前心理准备', content: '比赛前避免过度思考结果，专注于执行计划。制定3个简单战术目标，如"每局发球上旋""优先打对手反手"。充分热身让身体激活，稳定赛前情绪。' },
+            { title: '二、关键分的处理', content: '关键分（破发点、赛点）最容易出现失误。此时要降低击球节奏，以稳定为主。深呼吸，将注意力放在击球动作本身，而非比分结果。' },
+            { title: '三、连续失误后的调整', content: '连续失误时要暂停节奏，整理拍弦，给自己冷静的时间。分析失误原因（是主动失误还是被动失误），针对性调整策略，不要在情绪激动时强行改变打法。' },
+            { title: '四、保持专注', content: '每分之间用固定的准备动作（如弹跳、弄球）保持专注。忘记上一分，把注意力放在"此刻这一分"。比赛中避免与裁判过度争论，消耗精力。' }
+          ]
+        },
+        { id: 14, emoji: '🛒', title: '网球装备选购与保养', desc: '选对装备让训练事半功倍', memberOnly: true,
+          coverImg: IMG + '1516688800765-3cc4d9aead55?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '一、球拍选购指南', img: IMG + '1554068865-24cecd4e34b8?w=700&h=300&fit=crop&q=80',
+              content: '初学者推荐拍面较大（100-110平方英寸）、重量较轻（260-280g）的球拍，甜区大、更容易击球。进阶球员可选拍面95-100平方英寸、重量285-305g的控制型球拍。' },
+            { title: '二、球线选择与磅数', content: '初学者推荐多纤维线或尼龙线，弹性好，手臂友好，推荐磅数50-55磅。进阶选手可选聚酯硬线，增加旋转和控制，磅数55-60磅。磅数越低弹力越大，越高控制越精准。' },
+            { title: '三、球鞋与护具', content: '网球鞋要选横向支撑好、鞋底耐磨的专项鞋，避免跑步鞋代替。护膝、护腕在高强度训练时保护关节。握把汗带要定期更换，保持手感。' },
+            { title: '四、装备保养', content: '球拍避免高温暴晒和潮湿，碳纤维怕磕碰。球线在室外频繁打球建议每3个月更换一次。网球筒开封后最好一次用完，旧球弹性差影响练习质量。' }
+          ]
+        },
+        { id: 15, emoji: '👶', title: '青少年网球训练要点', desc: '科学培养青少年网球技能', memberOnly: true,
+          coverImg: IMG + '1474274153-89b18f29a7ae?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '一、分龄训练原则', content: '6-8岁：以游戏为主，培养兴趣，使用泡沫球和迷你球场。9-12岁：建立基础技术，重点抓握拍、步法和基本击球。13岁以上：专项技术训练，引入战术意识和竞技比赛。' },
+            { title: '二、技术顺序安排', content: '建议顺序：①正手→②反手→③发球→④截击→⑤战术。每项技术打好基础再进入下一项，避免同时堆砌过多动作，造成技术混乱。' },
+            { title: '三、保护身体发育', content: '青少年骨骼发育中，避免过度训练导致运动损伤。每周训练量循序渐进，充分热身与拉伸。发球动作要注意肩膀和肘部保护，避免过早练习高强度大力发球。' },
+            { title: '四、心理与兴趣培养', content: '比赛结果不是唯一目标，鼓励进步而非苛求胜负。创造轻松的训练氛围，用游戏化方式设计练习。家长和教练的鼓励对青少年长期坚持至关重要。' }
+          ]
+        },
+        { id: 16, emoji: '🏥', title: '网球伤病预防与康复', desc: '科学训练，远离运动损伤', memberOnly: true,
+          coverImg: IMG + '1571019613454-1cb2f99b2d8b?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '一、常见网球伤病', img: IMG + '1520877880798-5ee0a2571d9e?w=700&h=300&fit=crop&q=80',
+              content: '①网球肘（肱骨外上髁炎）：手腕伸展肌群过度使用，反手击球技术不当易引发；②肩袖损伤：发球和高压球动作中肩部旋转过度；③踝关节扭伤：快速变向时踝关节稳定性不足。' },
+            { title: '二、预防措施', content: '充分热身，避免冷身体上场。掌握正确动作，减少错误用力对关节的损耗。训练量循序渐进，避免突然增加强度。定期做力量和柔韧性训练，增强关节稳定性。' },
+            { title: '三、急性损伤处理', content: 'RICE原则：Rest（休息）、Ice（冰敷20分钟）、Compression（加压包扎）、Elevation（抬高患肢）。急性损伤24小时内切勿热敷，48小时后可温热水泡脚促进恢复。' },
+            { title: '四、康复训练', content: '伤后恢复期进行低强度的关节活动和肌力训练，逐步恢复运动量。建议在专业康复师指导下制定恢复计划。完全康复前不要急于重返高强度对抗训练。' }
+          ]
+        },
+        { id: 17, emoji: '🌟', title: '职业球员的训练日常', desc: '顶级选手的训练体系揭秘', memberOnly: true,
+          coverImg: IMG + '1518611012118-696072aa579a?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '一、一天的训练安排', img: IMG + '1534438327776-a9d64bc43ba6?w=700&h=300&fit=crop&q=80',
+              content: '职业球员通常：早上7点起床，8点体能训练（1.5小时）；10点上午技术训练（2小时）；下午2点战术和比赛模拟训练（2小时）；4点体能恢复训练（1小时）；晚上拉伸与冰浴恢复。' },
+            { title: '二、技术训练的核心', content: '多球训练是提升技术的核心方法，教练高频喂球，球员专注在固定技术动作上重复练习。每天至少500个正手、300个反手的多球训练量，形成肌肉记忆。' },
+            { title: '三、体能训练结构', content: '有氧基础（慢跑、自行车）+无氧爆发（冲刺、跳跃）+核心稳定（平板支撑、旋转练习）+敏捷性（绳梯、变向练习）。体能与技术是相辅相成的关系。' },
+            { title: '四、恢复的重要性', content: '职业选手同样重视恢复：冰浴、按摩、拉伸缺一不可。睡眠是最重要的恢复手段，顶级选手保证每晚8-9小时睡眠。营养补充在训练后30分钟内完成蛋白质和碳水化合物补给。' }
+          ]
+        },
+        { id: 18, emoji: '🥗', title: '网球运动营养与饮食', desc: '科学饮食为运动表现加分', memberOnly: true,
+          coverImg: IMG + '1461896836374-0f22516aa6a6?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '一、赛前饮食', content: '比赛前2-3小时进食，以高碳水、低脂肪、适量蛋白质为主。推荐：全麦面包+鸡蛋+香蕉+酸奶。避免高脂肪、高纤维食物，防止肠胃不适影响发挥。' },
+            { title: '二、比赛中补给', content: '每换边补充100-200ml运动饮料或水，及时补充电解质。长时间比赛（超过1.5小时）可补充香蕉、能量棒等快速碳水化合物，维持血糖水平和体力。' },
+            { title: '三、训练后恢复饮食', content: '训练后30分钟内是黄金补给窗口：补充20-30g蛋白质（鸡胸肉、蛋白粉、希腊酸奶）促进肌肉修复；同时补充碳水（米饭、面条）恢复糖原储备。' },
+            { title: '四、日常营养原则', content: '均衡饮食：碳水占50-60%，蛋白质占20-25%，脂肪占15-20%。多吃新鲜蔬果补充维生素和抗氧化物质。避免高糖饮料和酒精，保持良好的身体状态。' }
+          ]
+        },
+        { id: 19, emoji: '📋', title: '赛前准备与赛后总结', desc: '系统化备赛让你更有把握', memberOnly: true,
+          coverImg: IMG + '1546519638-68e109498ffc?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '一、赛前一周准备', content: '减少高强度训练量，保持感觉即可，避免赛前过度疲劳。安排好装备检查（球拍、球线、球鞋、换洗衣物）。调整作息时间，保证充足睡眠，不在赛前一天熬夜。' },
+            { title: '二、赛前热身流程', content: '抵达球场后：5分钟慢跑激活心肺；5分钟动态拉伸关节；底线对打热身（正手→反手→对角→直线）；发球热身（慢速→正式力度）；截击和放小球练习。总计约25-30分钟。' },
+            { title: '三、比赛中的调整', content: '第一盘开始时以稳定为主，探测对手特点（弱侧、体力、心理状态）。记录对手规律，在换边时利用90秒调整战术。不要过早放弃，网球比赛变数极大。' },
+            { title: '四、赛后总结与成长', content: '比赛结束后尽快做赛后总结：记录本场比赛的得分点和失分点；分析战术执行情况；记下需要在训练中改进的技术环节。长期坚持赛后复盘是快速进步的关键。' }
+          ]
+        },
+        { id: 20, emoji: '📜', title: '网球规则全面解析', desc: '了解规则，让比赛更顺畅', memberOnly: true,
+          coverImg: IMG + '1560012057-4372e14c5085?w=800&h=360&fit=crop&q=80',
+          sections: [
+            { title: '一、计分规则', content: '网球计分：0→15→30→40→Game。Deuce（平局40:40）后需连赢2分。通常需赢得6局（需领先2局）赢得一盘，比赛通常为3盘2胜或5盘3胜。' },
+            { title: '二、发球规则', content: '每分有2次发球机会，第一发球失误（出界或下网）可再发。第二发球再失误为双误，对手得分。发球必须对角线落入接发球方的服务区内，发球时脚不能踩线。' },
+            { title: '三、裁判判决', content: '球压线即为界内。Let球（发球触网后进入正确区域）重发，不算失误。比赛中球触网柱或对手身体均可得分。对裁判判决有异议时，须在下一分开始前提出。' },
+            { title: '四、常见规则细节', content: '①球弹两次后才击球失分；②手持球拍击球（非球拍框）有效；③双手接球视情况而定（正规比赛需单手反手也可双手）；④比赛中不得接受场外指导（职业规定）。' }
           ]
         }
     ];
@@ -1081,7 +1220,7 @@ document.addEventListener('DOMContentLoaded', () => {
             content.innerHTML = `<div class="tutorial-cover-wrap"><img class="tutorial-cover-img" src="${item.coverImg}" alt="${item.title}" loading="lazy"></div>`;
         }
 
-        if (item.memberOnly) {
+        if (item.memberOnly && !isVipMember()) {
             content.innerHTML += `
                 <div class="tutorial-vip-lock">
                     <div class="tutorial-vip-lock-icon">🔒</div>
@@ -1320,10 +1459,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function savePlan() {
         const name = (document.getElementById('plan-name-input').value || '').trim();
         if (!name) { showToast(t('planNameRequired')); return; }
+        const plans = loadPlans();
+        if (!isVipMember() && plans.length >= 2) {
+            closePlanModal();
+            showToast(t('planLimitReached'));
+            setTimeout(openVipPage, 500);
+            return;
+        }
         const desc     = (document.getElementById('plan-desc-input').value || '').trim();
         const duration = parseInt(document.getElementById('plan-dur-input').value) || 30;
         const diff     = document.getElementById('plan-diff-select').value;
-        const plans    = loadPlans();
         const bgIdx    = plans.length % PLAN_COLORS.length;
         plans.unshift({ id: 'p' + Date.now(), name, desc, duration, difficulty: diff, bgIdx, completed: false, createTime: Date.now() });
         savePlans(plans);

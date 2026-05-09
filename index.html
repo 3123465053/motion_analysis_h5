@@ -344,6 +344,7 @@
             <span class="material-icons vip-hero-crown">workspace_premium</span>
             <div class="vip-hero-title" data-i18n="vipHeroTitle">iSwingCoach 连续会员</div>
             <div class="vip-hero-sub" data-i18n="vipHeroSub">高级 AI 教练 · 无限换脸 · 专属模板</div>
+            <div id="vip-status-bar" class="vip-status-bar hidden"></div>
         </div>
 
         <!-- 特权列表 -->
@@ -403,6 +404,7 @@
                 <span class="vip-pay-text" data-i18n="vipPayWeChat">微信支付 开通会员</span>
             </div>
             <div class="vip-pay-agree" data-i18n="vipPayAgree">点击开通即视为同意《会员服务协议》，可随时取消订阅</div>
+            <div class="vip-cancel-btn" onclick="onVipCancelTap()" data-i18n="vipCancelSub">退订连续包月</div>
         </div>
 
         <!-- 购买须知 -->
@@ -552,6 +554,16 @@
                 <div class="plan-modal-btn plan-modal-ok" onclick="savePlan()" data-i18n="save">保存</div>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- VIP 开通成功弹窗 -->
+<div id="vip-success-modal" class="vip-success-modal hidden">
+    <div class="vip-success-card">
+        <div class="vip-success-icon">🎉</div>
+        <div class="vip-success-title" data-i18n="vipSuccessTitle">会员开通成功</div>
+        <div class="vip-success-sub" data-i18n="vipSuccessSub">您已成功开通会员，立即享受全部权益！</div>
+        <div class="vip-success-btn" onclick="closeVipSuccessModal()" data-i18n="vipSuccessBtn">开始使用</div>
     </div>
 </div>
 
